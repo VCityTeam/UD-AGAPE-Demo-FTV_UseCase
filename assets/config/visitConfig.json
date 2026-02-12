@@ -1,0 +1,483 @@
+{
+    "visits": [
+        {
+            "id": "demo_part_dieu",
+            "name": "Démonstration Part-Dieu",
+            "description": "",
+            "startIndex": 0,
+            "endIndex": 20,
+            "steps": [
+                {
+                    "previous": 0,
+                    "next": 1,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": []
+                },
+                {
+                    "previous": 1,
+                    "next": 2,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P1"
+                    ],
+                    "position": {
+                        "x": 1844243.68098429,
+                        "y": 5175490.1941033695,
+                        "z": 210
+                    },
+                    "rotation": {
+                        "x": 0,
+                        "y": 0.707,
+                        "z": 0.707,
+                        "w": 0
+                    }
+                },
+                {
+                    "previous": 1,
+                    "next": 3,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P2"
+                    ],
+                    "position": {
+                        "x": 1844001.8816483521,
+                        "y": 5175224.937685099,
+                        "z": 180
+                    },
+                    "rotation": {
+                        "x": 0.707,
+                        "y": 0,
+                        "z": 0,
+                        "w": 0.707
+                    }
+                },
+                {
+                    "previous": 2,
+                    "next": 4,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P3"
+                    ],
+                    "position": {
+                        "x": 1844100.0665572945,
+                        "y": 5174723.242375943,
+                        "z": 180
+                    },
+                    "rotation": {
+                        "x": 0.707,
+                        "y": 0,
+                        "z": 0,
+                        "w": 0.707
+                    }
+                },
+                {
+                    "previous": 3,
+                    "next": 5,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P4"
+                    ],
+                    "position": {
+                        "x": 1844150,
+                        "y": 5174423,
+                        "z": 180
+                    },
+                    "rotation": {
+                        "x": 0.707,
+                        "y": 0,
+                        "z": 0,
+                        "w": 0.707
+                    }
+                },
+                {
+                    "previous": 4,
+                    "next": 6,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P5"
+                    ],
+                    "position": {
+                        "x": 1844150,
+                        "y": 5174423,
+                        "z": 180
+                    },
+                    "rotation": {
+                        "x": 0.707,
+                        "y": 0,
+                        "z": 0,
+                        "w": 0.707
+                    }
+                },
+                {
+                    "previous": 5,
+                    "next": 7,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P6"
+                    ],
+                    "position": {
+                        "x": 1844125,
+                        "y": 5174623,
+                        "z": 180
+                    },
+                    "rotation": {
+                        "x": 0.707,
+                        "y": 0,
+                        "z": 0,
+                        "w": 0.707
+                    }
+                },
+                {
+                    "previous": 6,
+                    "next": 8,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P7"
+                    ],
+                    "position": {
+                        "x": 1840894.878980318,
+                        "y": 5175145.595348112,
+                        "z": 450
+                    },
+                    "rotation": {
+                        "x": -0.500,
+                        "y": 0.500,
+                        "z": 0.500,
+                        "w": -0.500
+                    }
+                },
+                {
+                    "previous": 7,
+                    "next": 9,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P8"
+                    ],
+                    "position": {
+                        "x": 1844255,
+                        "y": 5174580,
+                        "z": 180
+                    },
+                    "rotation": {
+                        "x": 0.707,
+                        "y": 0,
+                        "z": 0,
+                        "w": 0.707
+                    }
+                },
+                {
+                    "previous": 8,
+                    "next": 10,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P9"
+                    ],
+                    "position": {
+                        "x": 1844265,
+                        "y": 5174630,
+                        "z": 200
+                    },
+                    "rotation": {
+                        "x": 0.707,
+                        "y": 0,
+                        "z": 0,
+                        "w": 0.707
+                    }
+                },
+                {
+                    "previous": 9,
+                    "next": 11,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P10"
+                    ],
+                    "position": {
+                        "x": 1844280,
+                        "y": 5174750,
+                        "z": 210
+                    },
+                    "rotation": {
+                        "x": 0.707,
+                        "y": 0,
+                        "z": 0,
+                        "w": 0.707
+                    }
+                },
+                {
+                    "previous": 10,
+                    "next": 12,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P11"
+                    ],
+                    "position": {
+                        "x": 1844050,
+                        "y": 5174700,
+                        "z": 175
+                    },
+                    "rotation": {
+                        "x": -0.654,
+                        "y": 0.270,
+                        "z": 0.270,
+                        "w": -0.654
+                    }
+                },
+                {
+                    "previous": 11,
+                    "next": 13,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P12"
+                    ],
+                    "position": {
+                        "x": 1844265,
+                        "y": 5174660,
+                        "z": 220
+                    },
+                    "rotation": {
+                        "x": 0.707,
+                        "y": 0,
+                        "z": 0,
+                        "w": 0.707
+                    }
+                },
+                {
+                    "previous": 12,
+                    "next": 14,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P13"
+                    ],
+                    "position": {
+                        "x": 1844140,
+                        "y": 5174760,
+                        "z": 190
+                    },
+                    "rotation": {
+                        "x": -0.654,
+                        "y": 0.270,
+                        "z": 0.270,
+                        "w": -0.654
+                    }
+                },
+                {
+                    "previous": 13,
+                    "next": 15,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P14"
+                    ],
+                    "position": {
+                        "x": 1844140,
+                        "y": 5174880,
+                        "z": 190
+                    },
+                    "rotation": {
+                        "x": -0.300,
+                        "y": 0.640,
+                        "z": 0.640,
+                        "w": -0.300
+                    }
+                },
+                {
+                    "previous": 14,
+                    "next": 16,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P15"
+                    ],
+                    "position": {
+                        "x": 1844250,
+                        "y": 5174630,
+                        "z": 180
+                    },
+                    "rotation": {
+                        "x": 0.707,
+                        "y": 0,
+                        "z": 0,
+                        "w": 0.707
+                    }
+                },
+                {
+                    "previous": 15,
+                    "next": 17,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P16"
+                    ],
+                    "position": {
+                        "x": 1844275,
+                        "y": 5174780,
+                        "z": 180
+                    },
+                    "rotation": {
+                        "x": 0.653,
+                        "y": 0.271,
+                        "z": 0.271,
+                        "w": 0.653
+                    }
+                },
+                {
+                    "previous": 16,
+                    "next": 18,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P17"
+                    ],
+                    "position": {
+                        "x": 1844310,
+                        "y": 5174550,
+                        "z": 180
+                    },
+                    "rotation": {
+                        "x": 0.702,
+                        "y": 0.086,
+                        "z": 0.086,
+                        "w": 0.702
+                    }
+                },
+                {
+                    "previous": 17,
+                    "next": 19,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P18"
+                    ],
+                    "position": {
+                        "x": 1844140,
+                        "y": 5174820,
+                        "z": 190
+                    },
+                    "rotation": {
+                        "x": -0.500,
+                        "y": 0.500,
+                        "z": 0.500,
+                        "w": -0.500
+                    }
+                },
+                {
+                    "previous": 18,
+                    "next": 20,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P19"
+                    ],
+                    "position": {
+                        "x": 1840000,
+                        "y": 5173200,
+                        "z": 1000
+                    },
+                    "rotation": {
+                        "x": -0.500,
+                        "y": 0.500,
+                        "z": 0.500,
+                        "w": -0.500
+                    }
+                },
+                {
+                    "previous": 19,
+                    "next": 20,
+                    "layers": [
+                        "Ortho_IGN",
+                        "lyon3",
+                        "planar"
+                    ],
+                    "media": [
+                        "Video_AGAPE_P20"
+                    ],
+                    "position": {
+                        "x": 1840000,
+                        "y": 5173200,
+                        "z": 1000
+                    },
+                    "rotation": {
+                        "x": -0.500,
+                        "y": 0.500,
+                        "z": 0.500,
+                        "w": -0.500
+                    }
+                }
+            ]
+        }
+    ]
+}

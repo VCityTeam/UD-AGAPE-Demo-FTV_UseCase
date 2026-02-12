@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>widget guided tour</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../src/css/main_style.css" />
+</head>
+
+<body>
+    <script src="../dist/RUN_MODE/app.js"></script>
+
+    <script type="text/javascript">
+        const udviz = window.app;
+
+        udviz
+            .loadMultipleJSON([
+                '../assets/config/layerConfig.json',
+                '../assets/config/mediaConfig.json',
+                '../assets/config/visitConfig.json'
+            ])
+            .then((configs) => {
+                const visitConfig = configs[Object.keys(configs).find(key => /visitConfig/.test(key))]; // Ecriture lourde, mais permet de trouver le bon fichier dans ce qui est donné
+                const mediaConfig = configs[Object.keys(configs).find(key => /mediaConfig/.test(key))]; // sans devoir changer le nom partout si tenté qu'il n'y en ai qu'un de chauqe dans l'appel de loadMultipleJSON
+                const layerConfig = configs[Object.keys(configs).find(key => /layerConfig/.test(key))];
+
+                // Define the projection for the view
+                udviz.proj4.default.defs(
+                    layerConfig.projection,
+                    layerConfig.transform
+                );
+
+                // Define the extent for the view
+                const extent = new udviz.itowns.Extent(
+                    layerConfig.projection,
+                    parseInt(layerConfig.extents.min_x),
+                    parseInt(layerConfig.extents.max_x),
+                    parseInt(layerConfig.extents.min_y),
+                    parseInt(layerConfig.extents.max_y)
+                );
+
+                // Create a itowns planar view
+                const viewDomElement = document.createElement('div');
+                viewDomElement.classList.add('full_screen');
+                document.body.appendChild(viewDomElement);
+                const view = new udviz.itowns.PlanarView(viewDomElement, extent, { controls: { enabled: true, groundLevel: 0, smartTravelHeightMin: 0, handleCollisions: false } });
+
+                // Initialize 3D scene
+                udviz.initScene(
+                    view.camera.camera3D,
+                    view.mainLoop.gfxEngine.renderer,
+                    view.scene
+                );
+
+                // ADD LAYERS
+                // 3D Tiles layers
+                layerConfig['3DTilesLayers'].forEach((layerConfig) => {
+                    udviz.itowns.View.prototype.addLayer.call(
+                        view,
+                        new udviz.itowns.C3DTilesLayer(
+                            layerConfig['id'],
+                            {
+                                name: layerConfig['id'],
+                                source: new udviz.itowns.C3DTilesSource({
+                                    url: layerConfig['url'],
+                                }),
+                            },
+                            view
+                        )
+                    );
+                });
+
+                // Background image layer
+                view.addLayer(
+                    new udviz.itowns.ColorLayer(layerConfig['background_image_layer']['layer_name'], {
+                        updateStrategy: {
+                            type: udviz.itowns.STRATEGY_DICHOTOMY,
+                            options: {},
+                        },
+                        source: new udviz.itowns.WMSSource({
+                            extent: extent,
+                            name: layerConfig['background_image_layer']['name'],
+                            url: layerConfig['background_image_layer']['url'],
+                            version: layerConfig['background_image_layer']['version'],
+                            crs: extent.crs,
+                            format: layerConfig['background_image_layer']['format'],
+                        }),
+                        transparent: true,
+                    })
+                );
+
+                // Elevation layer
+                view.addLayer(
+                    new udviz.itowns.ElevationLayer(layerConfig['elevation_layer']['layer_name'],
+                        {
+                            useColorTextureElevation: true,
+                            colorTextureElevationMinZ:
+                                layerConfig['elevation_layer']['colorTextureElevationMinZ'],
+                            colorTextureElevationMaxZ:
+                                layerConfig['elevation_layer']['colorTextureElevationMaxZ'],
+                            source: new udviz.itowns.WMSSource({
+                                extent: extent,
+                                url: layerConfig['elevation_layer']['url'],
+                                name: layerConfig['elevation_layer']['name'],
+                                crs: extent.crs,
+                                heightMapWidth: 256,
+                                format: layerConfig['elevation_layer']['format'],
+                            }),
+                        }
+                    )
+                );
+
+                // console.log(mediaConfig.medias); Bien les medias de mediaConfig
+                // Initialize Guided Tour
+                const guidedTour = new udviz.GuidedVisit(
+                    view,
+                    visitConfig.visits[0],
+                    mediaConfig.medias
+                );
+
+                // Expose variables for debugging
+                window.view = view;
+                window.guidedTour = guidedTour;
+
+                guidedTour.goToStep(guidedTour.startIndex);
+            });
+    </script>
+    SCRIPT_TAG_RELOAD
+</body>
+
+</html>

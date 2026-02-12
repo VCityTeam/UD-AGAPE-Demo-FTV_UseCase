@@ -1,0 +1,480 @@
+{
+    "sources": {
+        "Licences": [
+            "CC BY-SA 3.0 <https://creativecommons.org/licenses/by-sa/3.0>, via Wikimedia Commons",
+            "GNU Free Documentation License 1.2 <https: //www.gnu.org/licenses/old-licenses/fdl-1.2.html> pour toutes les photos utilisées si dessous"
+        ]
+    },
+    "medias": [
+        {
+            "id": "Video_AGAPE_P1",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P1.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Amphiteatre_Trois_Gaules_Lyon.jpg",
+            "license": "CC BY-SA 3.0 and GNU Free Documentation License 1.2",
+            "position": {
+                "x": 1844243.68098429,
+                "y": 5175339.1941033695,
+                "z": 200
+            },
+            "rotation": {
+                "x": 0.707,
+                "y": 0,
+                "z": 0,
+                "w": 0.707
+            },
+            "scale": {
+                "x": 0.2,
+                "y": 0.2,
+                "z": 0.2
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P2",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P2.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Entr%C3%A9e_gare_Part-Dieu_Lyon.JPG",
+            "license": "CC BY-SA 3.0 and GNU Free Documentation License 1.2",
+            "position": {
+                "x": 1844010,
+                "y": 5175324,
+                "z": 180
+            },
+            "rotation": {
+                "x": 0.707,
+                "y": 0,
+                "z": 0,
+                "w": 0.707
+            },
+            "scale": {
+                "x": 0.07,
+                "y": 0.07,
+                "z": 0.07
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P3",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P3.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Horloge_Bourse_Lyon.jpg",
+            "license": "CC BY-SA 3.0 and GNU Free Documentation License 1.2",
+            "position": {
+                "x": 1844100.0665572945,
+                "y": 5174823.242375943,
+                "z": 180
+            },
+            "rotation": {
+                "x": 0.707,
+                "y": 0,
+                "z": 0,
+                "w": 0.707
+            },
+            "scale": {
+                "x": 0.07,
+                "y": 0.07,
+                "z": 0.07
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P4",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P4.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Abbaye_ainay_Lyon.jpg",
+            "license": "CC BY-SA 3.0 and GNU Free Documentation License 1.2",
+            "position": {
+                "x": 1844150,
+                "y": 5174523,
+                "z": 180
+            },
+            "rotation": {
+                "x": 0.707,
+                "y": 0,
+                "z": 0,
+                "w": 0.707
+            },
+            "scale": {
+                "x": 0.07,
+                "y": 0.07,
+                "z": 0.07
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P5",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P5.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Lyon_fete_des_Lumieres_2013.jpg",
+            "license": "CC BY-SA 4.0",
+            "position": {
+                "x": 1844150,
+                "y": 5174523,
+                "z": 180
+            },
+            "rotation": {
+                "x": 0.707,
+                "y": 0,
+                "z": 0,
+                "w": 0.707
+            },
+            "scale": {
+                "x": 0.07,
+                "y": 0.07,
+                "z": 0.07
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P6",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P6.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Lyon_Place_Bellecour.JPG",
+            "license": "CC BY-SA 3.0 and GNU Free Documentation License 1.2",
+            "position": {
+                "x": 1844125,
+                "y": 5174723,
+                "z": 180
+            },
+            "rotation": {
+                "x": 0.707,
+                "y": 0,
+                "z": 0,
+                "w": 0.707
+            },
+            "scale": {
+                "x": 0.07,
+                "y": 0.07,
+                "z": 0.07
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P7",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P7.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Lyon_P1190149.jpg",
+            "license": "CC BY-SA 3.0",
+            "position": {
+                "x": 1841794.878980318,
+                "y": 5175145.595348112,
+                "z": 400
+            },
+            "rotation": {
+                "x": 0.500,
+                "y": -0.500,
+                "z": -0.500,
+                "w": 0.500
+            },
+            "scale": {
+                "x": 0.7,
+                "y": 0.7,
+                "z": 0.7
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P8",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P8.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Lyon_fourviere.JPG",
+            "license": "CC BY-SA 3.0 and GNU Free Documentation License 1.2",
+            "position": {
+                "x": 1844265,
+                "y": 5174760,
+                "z": 200
+            },
+            "rotation": {
+                "x": 0.707,
+                "y": 0,
+                "z": 0,
+                "w": 0.707
+            },
+            "scale": {
+                "x": 0.1,
+                "y": 0.1,
+                "z": 0.1
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P9",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P9.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Lyon_Parc_Tete_d'Or_serre.jpg",
+            "license": "CC BY-SA 3.0 and GNU Free Documentation License 1.2",
+            "position": {
+                "x": 1844275,
+                "y": 5174780,
+                "z": 200
+            },
+            "rotation": {
+                "x": 0.707,
+                "y": 0,
+                "z": 0,
+                "w": 0.707
+            },
+            "scale": {
+                "x": 0.05,
+                "y": 0.05,
+                "z": 0.05
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P10",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P10.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Place_Sathonay_Lyon.jpg",
+            "license": "CC BY-SA 3.0 and GNU Free Documentation License 1.2",
+            "position": {
+                "x": 1844280,
+                "y": 5174780,
+                "z": 210
+            },
+            "rotation": {
+                "x": 0.707,
+                "y": 0,
+                "z": 0,
+                "w": 0.707
+            },
+            "scale": {
+                "x": 0.02,
+                "y": 0.02,
+                "z": 0.02
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P11",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P11.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Pont-R08-Lafayet-10.JPG",
+            "license": "CC BY-SA 3.0 and GNU Free Documentation License 1.2",
+            "position": {
+                "x": 1844240,
+                "y": 5174850,
+                "z": 200
+            },
+            "rotation": {
+                "x": 0.500,
+                "y": -0.500,
+                "z": -0.500,
+                "w": 0.500
+            },
+            "scale": {
+                "x": 0.2,
+                "y": 0.2,
+                "z": 0.2
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P12",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P12.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Enfants_Du_Rhone_Lyon.jpg",
+            "license": "CC BY-SA 3.0 and GNU Free Documentation License 1.2",
+            "position": {
+                "x": 1844275,
+                "y": 5174780,
+                "z": 210
+            },
+            "rotation": {
+                "x": 0.707,
+                "y": 0,
+                "z": 0,
+                "w": 0.707
+            },
+            "scale": {
+                "x": 0.05,
+                "y": 0.05,
+                "z": 0.05
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P13",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P13.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Lyon_pradel_01.jpg",
+            "license": "CC BY-SA 2.0",
+            "position": {
+                "x": 1844240,
+                "y": 5174850,
+                "z": 200
+            },
+            "rotation": {
+                "x": 0.500,
+                "y": -0.500,
+                "z": -0.500,
+                "w": 0.500
+            },
+            "scale": {
+                "x": 0.1,
+                "y": 0.1,
+                "z": 0.1
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P14",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P14.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Lyon_St_Jean_Basilica_Notre_Dame_de_Fourviere.jpg",
+            "license": "CC BY-SA 2.5 Generic",
+            "position": {
+                "x": 1844240,
+                "y": 5174850,
+                "z": 190
+            },
+            "rotation": {
+                "x": 0.500,
+                "y": -0.500,
+                "z": -0.500,
+                "w": 0.500
+            },
+            "scale": {
+                "x": 0.1,
+                "y": 0.1,
+                "z": 0.1
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P15",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P15.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Palais_de_la_Bourse_Lyon_northeastern_corner.jpg",
+            "license": "CC BY-SA 3.0",
+            "position": {
+                "x": 1844275,
+                "y": 5174780,
+                "z": 180
+            },
+            "rotation": {
+                "x": 0.707,
+                "y": 0,
+                "z": 0,
+                "w": 0.707
+            },
+            "scale": {
+                "x": 0.1,
+                "y": 0.1,
+                "z": 0.1
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P16",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P16.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Roman_theatre_in_Lyon.jpg",
+            "license": "Released into the public domain by its author, Vicent.bloch. This applies worldwide.",
+            "position": {
+                "x": 1844180,
+                "y": 5174860,
+                "z": 200
+            },
+            "rotation": {
+                "x": -0.500,
+                "y": 0.500,
+                "z": 0.500,
+                "w": -0.500
+            },
+            "scale": {
+                "x": 0.07,
+                "y": 0.07,
+                "z": 0.07
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P17",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P17.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Lyon_toits_01.jpg",
+            "license": "CC BY-SA 2.0",
+            "position": {
+                "x": 1844250,
+                "y": 5174850,
+                "z": 180
+            },
+            "rotation": {
+                "x": 0,
+                "y": 0.707,
+                "z": 0.707,
+                "w": 0
+            },
+            "scale": {
+                "x": 0.2,
+                "y": 0.2,
+                "z": 0.2
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P18",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P18.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Lyon_-_Rue_Octavio_Mey_et_Gare_Saint-Paul_(flamme_de_1904).jpg",
+            "license": "This image (or other media file) is in the public domain because its copyright has expired and its author is anonymous. This applies to the European Union and those countries with a copyright term of 70 years after the work was made available to the public and the author never disclosed their identity.",
+            "position": {
+                "x": 1844240,
+                "y": 5174820,
+                "z": 190
+            },
+            "rotation": {
+                "x": 0.500,
+                "y": -0.500,
+                "z": -0.500,
+                "w": 0.500
+            },
+            "scale": {
+                "x": 0.1,
+                "y": 0.1,
+                "z": 0.1
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P19",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P19.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:01._Panorama_de_Lyon_pris_depuis_le_toit_de_la_Basilique_de_Fourvière.jpg",
+            "license": "CC BY-SA 3.0 and GNU Free Documentation License 1.2",
+            "position": {
+                "x": 1841000,
+                "y": 5173200,
+                "z": 1000
+            },
+            "rotation": {
+                "x": 0.500,
+                "y": -0.500,
+                "z": -0.500,
+                "w": 0.500
+            },
+            "display3D": true
+        },
+        {
+            "id": "Video_AGAPE_P20",
+            "type": "image",
+            "value": "../assets/media/images/Video_AGAPE_P20.jpg",
+            "source": "https://commons.wikimedia.org/wiki/File:Vue_sur_la_Part-Dieu_depuis_le_Mont_Cindre_(ao%C3%BBt_2019).jpg",
+            "license": "CC BY-SA 4.0",
+            "position": {
+                "x": 1841000,
+                "y": 5173200,
+                "z": 1000
+            },
+            "rotation": {
+                "x": 0.500,
+                "y": -0.500,
+                "z": -0.500,
+                "w": 0.500
+            },
+            "display3D": true
+        }
+    ]
+}
