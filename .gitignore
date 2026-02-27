@@ -1,0 +1,12 @@
+**/idea/
+**/node_modules/
+**/TODO.txt
+TODO.txt
+**/dist
+**/lib
+.vs
+.vscode
+Test/**
+**/LYON_3EME_2018
+**/assets/media/videos/*
+.DS_Store
