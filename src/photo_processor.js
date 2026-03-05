@@ -1,4 +1,4 @@
-// Initialize Proj4 (EPSG:4326 to EPSG:3946)
+// pour proj4
 proj4.defs(
     "EPSG:3946",
     "+proj=lcc +lat_0=46 +lon_0=3 +lat_1=45.25 +lat_2=46.75 +x_0=1700000 +y_0=5200000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs +type=crs"
@@ -23,16 +23,16 @@ function getRotations() {
         east: { x: -0.500, y: 0.500, z: 0.500, w: -0.500 },
         west: { x: 0.500, y: -0.500, z: -0.500, w: 0.500 },
         byPosition: {
-            0: { x: -0.500, y: 0.500, z: 0.500, w: -0.500 }, // east
-            1: { x: 0.707, y: 0, z: 0, w: 0.707 }, // north
-            2: { x: 0.500, y: -0.500, z: -0.500, w: 0.500 } // west
+            0: { x: -0.500, y: 0.500, z: 0.500, w: -0.500 }, // est
+            1: { x: 0.707, y: 0, z: 0, w: 0.707 }, // nord
+            2: { x: 0.500, y: -0.500, z: -0.500, w: 0.500 } // ouest
         }
     };
 }
 
 function parseEXIFDate(dateString) {
     if (!dateString) return null;
-    // EXIF format: "YYYY:MM:DD HH:MM:SS"
+    // Format des metadonnées "YYYY:MM:DD HH:MM:SS"
     const parts = dateString.split(' ');
     if (parts.length !== 2) return null;
     const dateParts = parts[0].split(':');
@@ -47,7 +47,6 @@ document.getElementById('imageInput').addEventListener('change', async (event) =
     const files = Array.from(event.target.files);
     if (files.length === 0) return;
 
-    // Reset UI
     resultsSection.style.display = 'block';
     logArea.innerHTML = '';
     downloadMediaBtn.style.display = 'none';
@@ -55,7 +54,7 @@ document.getElementById('imageInput').addEventListener('change', async (event) =
 
     log(`Traitement de ${files.length} images...`);
 
-    // 1. Extract Metadata
+    // 1. extraction des metadonnées
     const imagesWithMetadata = [];
 
     for (const file of files) {
@@ -71,7 +70,7 @@ document.getElementById('imageInput').addEventListener('change', async (event) =
                 const lat = tags['GPSLatitude'].description;
                 const lon = tags['GPSLongitude'].description;
 
-                // Convert coordinates
+                // coordonnées gps vers epsg 3946
                 const [x_3946, y_3946] = proj4('EPSG:4326', 'EPSG:3946', [lon, lat]);
 
                 imagesWithMetadata.push({
@@ -88,7 +87,7 @@ document.getElementById('imageInput').addEventListener('change', async (event) =
         }
     }
 
-    // Sort by datetime
+    // sort
     imagesWithMetadata.sort((a, b) => a.datetime - b.datetime);
     log(`Métadonnées extraites pour ${imagesWithMetadata.length} images valides.`);
 
@@ -97,7 +96,7 @@ document.getElementById('imageInput').addEventListener('change', async (event) =
         return;
     }
 
-    // 2. Group Images by Time (< 11 seconds apart)
+    // 2. grouping par temps de prise de photo
     const imagesGroupsByTime = {};
     for (let i = 0; i < imagesWithMetadata.length - 1; i++) {
         const diffSeconds = (imagesWithMetadata[i + 1].datetime - imagesWithMetadata[i].datetime) / 1000;
@@ -114,7 +113,7 @@ document.getElementById('imageInput').addEventListener('change', async (event) =
         }
     }
 
-    // Merge overlapping groups
+    // quand photo dans plusieurs groupes --> même groupe
     let merged = true;
     while (merged) {
         merged = false;
@@ -141,14 +140,14 @@ document.getElementById('imageInput').addEventListener('change', async (event) =
         }
     }
 
-    // Sort within groups and finalize
+    // sort a nouveau
     for (const group in imagesGroupsByTime) {
         imagesGroupsByTime[group].sort((a, b) => a.datetime - b.datetime);
     }
 
     log(`Nombre de groupes créés: ${Object.keys(imagesGroupsByTime).length}`);
 
-    // 3. Create Output Data (Media)
+    // 3. creation de mediaConfig
     const outputData = [];
     let imageId = 1;
     const rotations = getRotations();
@@ -181,7 +180,7 @@ document.getElementById('imageInput').addEventListener('change', async (event) =
         });
     }
 
-    // 4. Create Visit Dictionary
+    // 4. creation du visitConfig
     const visitDictionary = {
         visits: [
             {
