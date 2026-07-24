@@ -1,0 +1,32 @@
+{
+  "visits": [
+    {
+      "id": "2dObjectPos",
+      "name": "2dObjectPos",
+      "description": "Objet 2D posé dans une scène iTowns, selon les axes X, Y et Z",
+      "steps": [
+        {
+          "id": 0,
+          "type": "image_step",
+          "layers": [
+            "Ortho_IGN",
+            "lyon_2018", 
+            "planar"
+          ],
+          "media": [{"id": "2dImagePos"}],
+          "cameraPosition": {
+            "x": 1844924,
+            "y": 5175065,
+            "z": 150
+          },
+          "cameraRotation": {
+            "x": 0.505,
+            "y": 0.505,
+            "z": 0.505,
+            "w": 0.505
+          }
+        }
+      ]
+    }
+  ]
+}

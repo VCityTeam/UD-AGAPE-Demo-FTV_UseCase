@@ -1,0 +1,366 @@
+body {
+  display: block;
+  overflow: auto;
+  background:
+    radial-gradient(circle at top left, rgba(229, 18, 123, 0.14), transparent 34%),
+    radial-gradient(circle at top right, rgba(132, 145, 48, 0.12), transparent 28%),
+    linear-gradient(180deg, #fffdf7 0%, #f4f6ef 100%);
+  font-family: 'Roboto', sans-serif;
+}
+
+.editor_shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+}
+
+.editor_sidebar {
+  padding: 28px 20px;
+  background: rgba(255, 255, 255, 0.78);
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.editor_brand h1 {
+  margin: 4px 0 8px;
+  color: #e5127b;
+  font-size: 2.4rem;
+}
+
+.editor_kicker {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.78rem;
+  color: #849130;
+  font-weight: 700;
+}
+
+.editor_intro {
+  margin: 0;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.74);
+}
+
+.editor_panel {
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 14px 40px rgba(17, 17, 17, 0.06);
+}
+
+.editor_sidebar .editor_panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.editor_panel h2 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.editor_button,
+.editor_file_button {
+  border: 0;
+  border-radius: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+  font-size: 0.98rem;
+  font-weight: 700;
+  text-align: left;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.save_button {
+  border: 0;
+  border-radius: 14px;
+  padding: 12px 14px;
+  cursor: pointer;
+  font-size: 0.98rem;
+  font-weight: 700;
+  text-align: left;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  width: 20%;
+}
+
+.editor_button {
+  background: #eef1e7;
+  color: #222;
+}
+
+.editor_button:hover,
+.editor_file_button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.editor_button_accent,
+.editor_file_button {
+  background: #e5127b;
+  color: white;
+}
+
+.editor_button_secondary {
+  background: #537eb0;
+  color: white;
+}
+
+.editor_file_button {
+  display: inline-block;
+}
+
+#json_import_input {
+  display: none;
+}
+
+.editor_status {
+  margin-top: auto;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(252, 249, 232, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  font-size: 0.92rem;
+}
+
+.editor_main {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.editor_form_panel label,
+.step_field label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.editor_form_panel input,
+.editor_form_panel textarea,
+.editor_form_panel select,
+.step_field input,
+.step_field textarea,
+.step_field select {
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 12px 12px;
+  font: inherit;
+  background: white;
+}
+
+.editor_form_panel textarea.invalid,
+.step_field textarea.invalid {
+  border-color: #e5127b;
+  box-shadow: 0 0 0 2px rgba(229, 18, 123, 0.14);
+}
+
+.editor_form_panel textarea,
+.step_field textarea {
+  resize: vertical;
+}
+
+.step_field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.toggle_field {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.toggle_field span {
+  margin: 0;
+  line-height: 1;
+}
+
+.choice_bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 4px;
+}
+
+.option_button,
+.mini_button {
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.option_button {
+  background: #eef1e7;
+  color: #222;
+}
+
+.mini_button {
+  background: #537eb0;
+  color: white;
+}
+
+.optional_section {
+  margin-top: 4px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(252, 249, 232, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.optional_section_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.optional_section_header h4 {
+  margin: 0;
+}
+
+.nested_list {
+  display: grid;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.nested_card {
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  display: grid;
+  gap: 10px;
+}
+
+.nested_card .step_field {
+  margin: 0;
+}
+
+.editor_grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.editor_section_header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.steps_container {
+  display: grid;
+  gap: 14px;
+}
+
+.step_card {
+  border-radius: 18px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 16px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.05);
+}
+
+.step_card_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.step_card_header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.step_card_actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.step_action_button {
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 10px;
+  cursor: pointer;
+  background: #f0f0f0;
+  font-weight: 700;
+}
+
+.step_fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.step_field_wide {
+  grid-column: 1 / -1;
+}
+
+.vector_grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.vector_grid_3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.vector_axis_field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vector_axis_label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(0, 0, 0, 0.58);
+  margin-left: 2px;
+}
+
+.step_hint {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 0.88rem;
+}
+
+@media (max-width: 1100px) {
+  .editor_shell {
+    grid-template-columns: 1fr;
+  }
+
+  .editor_sidebar {
+    border-right: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .editor_grid,
+  .step_fields,
+  .vector_grid {
+    grid-template-columns: 1fr;
+  }
+}

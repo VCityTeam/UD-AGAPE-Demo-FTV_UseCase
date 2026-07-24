@@ -8,14 +8,25 @@ The second page of the project allows user to create their own demo, by creating
 
 ### Prerequisites
 
+- Any code editor (VSCode, Atom, Sublime Text, etc.) to edit the configuration files.
 - Node.js installed on your machine.
 - `npm` (Node Package Manager).
 
 ### Installation
 
-1.  Clone the repository or download the source code.
-2.  Navigate to the project directory in your terminal.
-3.  Install dependencies:
+1. Clone the repository or download the source code.
+
+```bash
+git clone https://github.com/VCityTeam/UD-AGAPE-Demo-FTV_UseCase.git
+```
+
+2. Navigate to the project directory in your terminal.
+
+```bash
+cd UD-AGAPE-Demo-FTV_UseCase
+```
+
+3. Install dependencies:
 
 ```bash
 npm install
@@ -36,24 +47,31 @@ To build and run for production:
 ```bash
 npm run start
 ```
-or 
+
+or
+
 ``` bash
 npm run start-debug
 ```
+
 if you want to do change to files other than the JavaScript and not have to restart the demo
 
 ## Project Structure
 
--   `src/`: Contains the source code of the application (JavaScript logic).
-    -   `guidedVisit.js`: Main logic for the guided tour validation and execution.
--   `assets/`: Static assets.
-    -   `config/`: Configuration files (JSON) for the 'compositions' demo content, and also the layer and media configuration files.
+- `src/`: Contains the source code of the application (JavaScript logic).
+    - `guidedVisit.js`: Main logic for the guided tour validation and execution.
+- `assets/`: Static assets.
+    - `config/`: Configuration files (JSON) for the 'compositions' demo content, and also the layer and media configuration files.
         - `functionsConfigFolder`: Configuration files (JSON) for the 'compositions' demo content
-    -   `media/`: Documents used in the demo, in their respective folders (videos, images, obj3d...).
-    -   `icons`: Icons used in the demos
-    -   `logos`: Logos used in the demos, usually of entities that have contributed to the project
--   `html/`: HTML entry points (`hub_demos.html` and `config_editor.html` as of now).
--   `bin/`: Backend server scripts.
+        - `functionsCompositionConfigFolder`: Configuration files (JSON) for the 'compositions' demo content
+        - `layerConfig.json`: Configuration file for the geospatial layers, initial view extent, and projection details.
+        - `mediaConfig.json`: Configuration file for the multimedia resources (videos, images, other objects... ) used in the visit.
+        - `functionsConfig.json`: Configuration file for the different functions and their respective configuration files.
+    - `media/`: Documents used in the demo, in their respective folders (videos, images, obj3d...).
+    - `icons`: Icons used in the demos
+    - `logos`: Logos used in the demos, usually of entities that have contributed to the project
+- `html/`: HTML entry points (`hub_demos.html` and `config_editor.html` as of now).
+- `bin/`: Backend server scripts.
 - Other files: `package.json`, `webpack.config.js`, etc. for project configuration and dependencies.
 - Other `.md` files: Documentation and UML diagrams for the project.
 
@@ -66,11 +84,12 @@ The content and behavior of the demo are driven by JSON configuration files loca
 Defines the geospatial layers, initial view extent, and projection details.
 
 **Fields:**
--   `projection`, `transform`: Coordinate system configurations, particularly important for determining the coordinates that will be used for the positions of the camera in `visitConfig.json` and for the position of medias in `mediaConfig.json`.
+
+- `projection`, `transform`: Coordinate system configurations, particularly important for determining the coordinates that will be used for the positions of the camera in `visitConfig.json` and for the position of medias in `mediaConfig.json`.
 - `extents`: Defines the initial view extent of the scene, expressed in the `projection` coordinates.
--   `3DTilesLayers`: 3D tilesets (e.g., building models).
--   `elevation_layer`: Elevation layer configuration.
--   `background_image_layer`: Background image layer configuration.
+- `3DTilesLayers`: 3D tilesets (e.g., building models).
+- `elevation_layer`: Elevation layer configuration.
+- `background_image_layer`: Background image layer configuration.
 
 ### 2. `mediaConfig.json`
 
@@ -101,15 +120,16 @@ classDiagram
 ```
 
 **Media Object Fields:**
--   `id`: Unique identifier for the media type (to reference in `visitConfig.json` for it to show up).
--   `type`: Type of media (`video`, `image`, `text`, `audio`, `file`, `obj3d`).
--   `value`: Path to the media file (e.g., `../assets/media/videos/Video_P2.mp4`).
--   `isFullScreen` (Optional): Boolean indicating if the media should be displayed in full screen mode.
--   `position` (Optional): Default `{x, y, z}` coordinates to place the media in the 3D scene.
--   `rotation` (Optional): Default `{x, y, z, w}` quaternion for the object's orientation in the scene.
--   `scale` (Optional): Default `{x, y, z}` scale factors forn the object.
 
-### 3. `visitConfig.json`
+- `id`: Unique identifier for the media type (to reference in `visitConfig.json` for it to show up).
+- `type`: Type of media (`video`, `image`, `text`, `audio`, `file`, `obj3d`).
+- `value`: Path to the media file (e.g., `../assets/media/videos/Video_P2.mp4`).
+- `isFullScreen` (Optional): Boolean indicating if the media should be displayed in full screen mode.
+- `position` (Optional): Default `{x, y, z}` coordinates to place the media in the 3D scene.
+- `rotation` (Optional): Default `{x, y, z, w}` quaternion for the object's orientation in the scene.
+- `scale` (Optional): Default `{x, y, z}` scale factors forn the object.
+
+### 3. `visitConfig.json` type configuration files
 
 This file defines the steps of the guided tour.
 
@@ -164,7 +184,6 @@ classDiagram
     Step "0" *-- "n" Media
 ```
 
-
 **Visit Object Fields:**
 
 - `id`: Unique ID for the visit.
@@ -186,47 +205,76 @@ classDiagram
 
 ### How to Change Media files
 
+If you want to change either the media configuration file or the visit configuration file, you can do it manually or through the form on the second page of the project.
+
+Automatically:
+
+Click on the "Retour à l'acceuil" button on the top-right of the screen and then the "Editeur de fichiers de configuration" button. This will take you to the second page of the project where you can edit the configuration files through a form. You can add new media, change existing media, and update the visit steps accordingly.
+
+Manually:
+
 1. **Add your file**: Place your video or image file in the `assets/media/` folder (inside `assets/media/videos/`, `assets/media/images/`, etc.).
 2. **Update `mediaConfig.json`**:
     * Find the media entry you want to change, or create a new one in the `medias` array.
     * Update the `value` path to point to your new file (e.g., `"../assets/media/videos/my_new_video.mp4"`).
-    * If you added a new entry, give it a unique `id`.
+    * If you added a new entry, give it a unique `id`. The `id`has to be the same name as the file is called, without the extension. For example, if your file is `my_new_video.mp4`, the `id` should be `my_new_video`.
 
-### How to Update the Visit Steps
+### How to Update/Add the Visit Steps
 
-1.  **Modify `visitConfig.json`**:
-    *   Locate the step you want to change in the `steps` array.
-    *   **Change position/view**: Update the `position` and `rotation` values. You can get these values by logging the camera position in the browser console while navigating the 3D scene in debug mode (see below).
-    *   **Add/Remove Media**: Update the `media` array for that step with the `id` of the media you defined in `mediaConfig.json`.
+To add a new step, you need to create a new step object in the `steps`array of `visitConfig.json` with the fields defined above. Make sure to give it a unique `id` and any other parameters that you need.
 
-### How to Add a New Step
+To just update a step, you can modify the existing step object in the `steps` array of `visitConfig.json`.
 
-You need to create a new step object in the `steps`array of `visitConfig.json` with the fields defined above. Make sure to give it a unique `id` and any other parameters that you need.
+1. **Modify `visitConfig.json`**:
+    * Locate the step you want to change in the `steps` array.
+    * **Change position/view**: Update the `position` and `rotation` values. You can get these values by logging the camera position in the browser console while navigating the 3D scene in debug mode (see below).
+    * **Add/Remove Media**: Update the `media` array for that step with the `id` of the media you defined in `mediaConfig.json`.
+
+### If you have created a new visit configuration file
+
+1. Place your new visit configuration file in the `assets/config/` folder.
+2. Update the `functionsConfig.json` file to include your new visit configuration file in the `visitConfigFiles` array. With this format:
+
+```json
+{
+    "id": "name_of_visit",
+    "name": "nom de la visite",
+    "category": "Objects Positioning ou Camera Actions ou Object Actions ou Composition of functions",
+    "config": "dossier/nom_du_fichier.json",
+    "status": "okay"
+}
+```
+
+This will make it available in the demo page for selection and viewing.
 
 ## Development / Debugging
 
 To help you find the right coordinates for your new steps or media:
 
-1.  Open the application in your browser (localhost).
-2.  Open the Developer Console (F12 or Ctrl+Shift+I).
-3.  The `view` and `guidedTour` objects are exposed globally.
-4.  Navigate to the desired view in the 3D scene.
-5.  Run the following commands in the console to get the current position and rotation:
+1. Open the application in your browser (http://localhost:8080).
+2. Open the Developer Console (F12 or Ctrl+Shift+I).
+3. The `view` and `guidedTour` objects are exposed globally.
+4. Navigate to the desired view in the 3D scene. (Controls are a bit broken on Firefox, hence using a Chromium-based browser is recommended.)
+You can use these controls:
+**Left Mouse Button**: Move around by dragging the mouse.
+**Ctrl+Left Mouse Button**: Rotate the camera around the target point.
+***Mouse Wheel**: Zoom in/out.
+**Spacebar**: Auto-path to where you last clicked on the scene.
+**T key**: Move the camera to be above where it looked when the key was pressed.
+**Left/Right Arrow Keys**: Go to the previous/next step.
+**N Key**: Go to the next point in the `cameraLookAt` list if there are multiple points defined in the current step.
+5. Run the following commands in the console to get the current position and rotation:
 
-To get the camera position:
+To get the camera position (where you are standing):
+
 ```javascript
 view.camera.camera3D.position
 ```
+
 To get the camera rotation (quaternion):
+
 ```javascript
 view.camera.camera3D.quaternion
 ```
 
 Copy these values into your `visitConfig.json` or `mediaConfig.json` depending on your need.
-
-## Things you'll be able do to and see in this demo
-
-- Navigate through the scene with mouse movements
-- See 3D buildings in the scene (all white as they are not textured)
-- Change steps (can be seen in `visitConfig.json`) by using the arrow keys (left arrow for previous step, right arrow for next step) and get automatically transported to the new position
-- See multimedia documents (videos, images, etc.) at various coordinates and rotations at each "step" of the demo (can be seen in `mediaConfig.json`)

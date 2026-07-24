@@ -1,10 +1,11 @@
 html,
 body {
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   margin: 0;
   padding: 0;
-  display: block;
+  display: flex;
+  flex-direction: row;
   font-family: 'Roboto', sans-serif;
   font-stretch: normal;
   font-style: normal;
@@ -39,6 +40,30 @@ body {
 
 button {
   font-family: 'Roboto', sans-serif !important;
+}
+
+.editor_back_button {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 1000;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.82);
+  color: rgba(0, 0, 0, 0.72);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(6px);
+  transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.editor_back_button:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.96);
+  color: #000;
 }
 
 h1 {
@@ -187,4 +212,125 @@ audio {
   left: 0;
   overflow: hidden;
   z-index: 0;
+}
+
+.demo_hub_screen {
+  flex: 1;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.demo_hub_menu {
+  flex: 0 0 20vw;
+  min-width: 250px;
+  max-width: 350px;
+  height: 100vh;
+  background-color: #f9f9f9;
+  border-right: 1px solid #ddd;
+  position: relative;
+  z-index: 10;
+  overflow-y: auto;
+}
+
+/* Force the invisible CSS2DRenderer container to let clicks pass through to the canvas */
+.demo_hub_screen>div:not(.itowns-bubble)[style*="z-index: 1"] {
+  pointer-events: none !important;
+}
+
+/* Ensure any interactive HTML bubbles we append still capture clicks and hover effects */
+.itowns-bubble {
+  background-color: white;
+  position: absolute;
+  padding: 5px;
+  border-radius: 5px;
+  pointer-events: auto !important;
+  z-index: 1000;
+  transform: translate(-50%, -100%);
+}
+
+.itowns-bubble-close-btn {
+  position: relative;
+  cursor: pointer;
+  float: right;
+  margin-left: 5px;
+  font-weight: bold;
+}
+
+.fullscreen-media-div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  pointer-events: auto;
+}
+
+.fullscreen-media-div > img,
+.fullscreen-media-div > video {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+  display: block;
+}
+
+.demo_hub_menu_container {
+  padding: 1.5rem;
+  font-family: Outfit, Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.demo_hub_label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.demo_hub_label.wip {
+  cursor: not-allowed;
+}
+
+.demo_hub_text {
+  margin-left: 8px;
+}
+
+.demo_hub_category {
+  display: flex;
+  flex-direction: column;
+}
+
+.demo_hub_category_label {
+  font-weight: bold;
+  margin: 0 0 10px 0;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 4px;
+}
+
+.demo_hub_subcategory {
+  display: flex;
+  flex-direction: column;
+  margin-left: 15px;
+  margin-top: 10px;
+}
+
+.demo_hub_subcategory_label {
+  margin: 0 0 8px 0;
+  color: #555;
+}
+
+.demo_hub_description {
+  padding: 1rem 1.25rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fafafa;
+  color: #333;
+  line-height: 1.5;
+  white-space: pre-wrap;
 }

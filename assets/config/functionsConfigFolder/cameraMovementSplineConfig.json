@@ -1,0 +1,36 @@
+{
+  "visits": [
+    {
+      "id": "cameraMovementSpline",
+      "name": "cameraMovementSpline",
+      "description": "Mouvement de caméra suivant une 'spline' (courbe paramétrique)",
+      "steps": [
+        {
+          "id": 0,
+          "type": "image_step",
+          "layers": [
+            "Ortho_IGN",
+            "lyon_2018",
+            "planar"
+          ],
+          "media": [],
+          "objectMovement": [
+            {
+            "objectId": "camera",
+            "type": "spline",
+            "pointsArray": [
+              { "x": 1843987.6, "y": 5175210.2, "z": 1500 },
+              { "x": 1843987.6, "y": 5175210.2, "z": 200 },
+              { "x": 1843987.6, "y": 5175210.2, "z": 1000 },
+              { "x": 1843987.6, "y": 5175210.2, "z": 400 },
+              { "x": 1843987.6, "y": 5175210.2, "z": 600 }
+            ],
+            "duration": 20000,
+            "loop": true
+          }
+        ]
+        }
+      ]
+    }
+  ]
+}

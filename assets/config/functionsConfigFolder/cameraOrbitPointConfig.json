@@ -1,0 +1,47 @@
+{
+  "visits": [
+    {
+      "id": "cameraLookAtArrayPoints",
+      "name": "cameraLookAtArrayPoints",
+      "description": "Utilisation de la fonction lookAt pour une liste de points, permettant à la caméra de regarder un point selon des coordonnées X, Y et Z.",
+      "steps": [
+        {
+          "id": 0,
+          "type": "image_step",
+          "layers": [
+            "Ortho_IGN",
+            "lyon_2018",
+            "planar"
+          ],
+          "media": [],
+          "cameraPosition": {
+            "x": 1844040,
+            "y": 5175100,
+            "z": 200
+          },
+          "cameraRotation": {
+            "x": 0.707,
+            "y": 0,
+            "z": 0,
+            "w": 0.707
+          },
+          "objectMovement": [
+            {
+              "objectId": "camera",
+              "type": "orbit",
+              "pointsArray": [
+                {
+                  "x": 1844040, "y": 5175100, "z": 200
+                }
+              ],
+              "cameraHeight": 250,
+              "radius": 150,
+              "duration": 20000
+            }
+          ],
+          "cameraLookAt": [{"x": 1844040, "y": 5175100, "z": 200}]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "visits": [
+    {
+      "id": "3dObjectPos",
+      "name": "3DObjectPos",
+      "description": "Objet 3D posé dans une escène iTowns, selon les axes X, Y et Z",
+      "steps": [
+        {
+          "id": 0,
+          "type": "image_step",
+          "layers": [
+            "Ortho_IGN",
+            "lyon_2018",
+            "planar"
+          ],
+          "media": [{"id": "3dObjectPos"}],
+          "cameraPosition": {
+            "x": 1844884,
+            "y": 5174880,
+            "z": 330
+          },
+          "cameraRotation": {
+            "x": 0.558,
+            "y": 0,
+            "z": 0.074,
+            "w": 0.827
+          }
+        }
+      ]
+    }
+  ]
+}

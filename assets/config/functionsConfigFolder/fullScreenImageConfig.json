@@ -1,0 +1,22 @@
+{
+  "visits": [
+    {
+      "id": "fullScreenImage",
+      "name": "fullScreenImage",
+      "description": "Image ou vidéo en plein écran, cachant la scène",
+      "steps": [
+        {
+          "id": 0,
+          "type": "image_step",
+          "layers": [
+            "Ortho_IGN",
+            "lyon_2018",
+            "planar"
+          ],
+          "cameraRotation": {"x": 0.505,"y": -0.505,"z": -0.505,"w": 0.505},
+          "media": [{"id": "2dImagePos", "isFullScreen": true}]
+        }
+      ]
+    }
+  ]
+}

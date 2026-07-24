@@ -1,0 +1,69 @@
+{
+    "functions": [
+        {
+            "id": "2dObjectPos",
+            "name": "2D Object Position",
+            "category": "Objects Positioning",
+            "config": "functionsConfigFolder/2dObjectPosConfig.json",
+            "status": "okay"
+        },
+        {
+            "id": "3dObjectPos",
+            "name": "3D Object Position",
+            "category": "Objects Positioning",
+            "config": "functionsConfigFolder/3dObjectPosConfig.json",
+            "status": "okay"
+        },
+        {
+            "id": "2dObjectLinearMovement",
+            "name": "2D Object Linear Movement",
+            "category": "Objects Positioning",
+            "config": "functionsConfigFolder/2dObjectLinearMovementConfig.json",
+            "status": "okay"
+        },
+        {
+            "id": "cameraLookAtPoint",
+            "name": "Camera Look At Point",
+            "category": "Camera Actions",
+            "subcategory": "Camera LookAt",
+            "config": "functionsConfigFolder/cameraLookAtPointConfig.json",
+            "status": "okay"
+        },
+        {
+            "id": "cameraLookAtArrayPoints",
+            "name": "Camera Look At Array Points",
+            "category": "Camera Actions",
+            "subcategory": "Camera LookAt",
+            "config": "functionsConfigFolder/cameraLookAtArrayPointsConfig.json",
+            "status": "okay"
+        },
+        {
+            "id": "cameraMovementSpline",
+            "name": "Camera Movement Spline",
+            "category": "Camera Actions",
+            "config": "functionsConfigFolder/cameraMovementSplineConfig.json",
+            "status": "okay"
+        },
+        {
+            "id": "cameraOrbitPoint",
+            "name": "Camera Orbit",
+            "category": "Camera Actions",
+            "config": "functionsConfigFolder/cameraOrbitPointConfig.json",
+            "status": "okay"
+        },
+        {
+            "id": "fullScreenImage",
+            "name": "Full Screen Image",
+            "category": "Object Positioning",
+            "config": "functionsConfigFolder/fullScreenImageConfig.json",
+            "status": "okay"
+        },
+        {
+            "id": "reconstructionVideo",
+            "name": "Reconstruction de la Video",
+            "category": "Composition of functions",
+            "config": "functionsCompositionConfigFolder/reconstructionVideoConfig.json",
+            "status": "okay"
+        }
+    ]
+}

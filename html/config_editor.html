@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../src/css/main_style.css" rel="stylesheet" />
+    <link href="../src/css/config_editor.css" rel="stylesheet" />
+    <link rel="icon" href="data:,">
+    <title>Editeur de JSON de visite et médias</title>
+</head>
+<body>
+    <button class="editor_back_button" onclick="location.href = '../index.html';">
+        Retour à l'accueil
+    </button>
+
+    <div class="editor_shell">
+        <aside class="editor_sidebar">
+            <div class="editor_brand">
+                <p class="editor_kicker">AGAPE</p>
+                <h1>Editeur de visite</h1>
+                <p class="editor_intro">Choisis un mode, visite ou médias, puis exporte le JSON correspondant.</p>
+            </div>
+
+            <div class="editor_panel">
+                <h2>Mode</h2>
+                <div class="choice_bar">
+                    <button class="editor_button editor_button_secondary" id="mode_media_button" type="button">Médias</button>
+                    <button class="editor_button editor_button_accent" id="mode_visit_button" type="button">Visite</button>
+                </div>
+            </div>
+
+            <div class="editor_panel" id="visit_sidebar_panel">
+                <h2>Templates rapides</h2>
+                <button class="editor_button editor_button_accent" data-action="add-step" data-template="basic">Ajouter une étape simple</button>
+            </div>
+
+            <div class="editor_panel" id="visit_file_panel">
+                <h2>Fichier visite</h2>
+                <button class="editor_button editor_button_accent" id="download_json_button">Télécharger le JSON</button>
+                <label class="editor_file_button" for="json_import_input">Importer un JSON</label>
+                <input id="json_import_input" type="file" accept="application/json,.json">
+                <button class="editor_button editor_button_secondary" id="reset_button">Réinitialiser</button>
+            </div>
+
+            <div class="editor_panel" id="media_file_panel" hidden>
+                <h2>Fichier médias</h2>
+                <button class="editor_button editor_button_accent" id="download_media_json_button">Télécharger le JSON des médias</button>
+                <label class="editor_file_button" for="media_json_import_input">Importer un JSON de médias</label>
+                <input id="media_json_import_input" type="file" accept="application/json,.json">
+                <label class="editor_file_button" for="media_upload_input">Ajouter un média depuis un fichier</label>
+                <input id="media_upload_input" type="file" accept="image/*,video/*,text/*,.gltf,.glb,.obj,.fbx,application/json,.json">
+                <button class="editor_button editor_button_secondary" id="reset_media_button">Réinitialiser les médias</button>
+            </div>
+
+            <div class="editor_status" id="editor_status">Prêt.</div>
+        </aside>
+
+        <main class="editor_main">
+            <section class="editor_panel editor_form_panel" id="visit_editor_panel">
+                <h2>Métadonnées de la visite</h2>
+                <div class="editor_grid">
+                    <label>
+                        <span>Id</span>
+                        <input id="visit_id_input" type="text" placeholder="Visit_1">
+                    </label>
+                    <label>
+                        <span>Nom</span>
+                        <input id="visit_name_input" type="text" placeholder="Generated Visit">
+                    </label>
+                </div>
+                <label>
+                    <span>Description</span>
+                    <textarea id="visit_description_input" rows="4" placeholder="Description de la visite"></textarea>
+                </label>
+
+                <div class="editor_section_header">
+                    <h2>Etapes</h2>
+                    <p id="step_count"></p>
+                </div>
+                <div id="steps_container" class="steps_container"></div>
+            </section>
+
+            <section class="editor_panel editor_form_panel" id="media_editor_panel" hidden>
+                <div class="editor_section_header">
+                    <h2>Médias</h2>
+                    <p id="media_count"></p>
+                </div>
+                <label class="step_field step_field_wide">
+                    <span>Média à éditer</span>
+                    <select id="media_selector"></select>
+                </label>
+                <div id="media_container" class="steps_container"></div>
+            </section>
+
+            <button class="save_button editor_button_accent" id="save_visit_localstorage_button">Sauvegarder la visite</button>
+            <button class="save_button editor_button_accent" id="save_media_localstorage_button">Sauvegarder les médias</button>
+
+        </main>
+    </div>
+
+    <script defer src="../src/js/configEditor.js"></script>
+</body>
+</html>
