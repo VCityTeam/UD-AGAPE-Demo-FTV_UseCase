@@ -8,7 +8,9 @@ export class GuidedVisit extends GuidedTour {
         super(view, config, medias);
         this.nextStepArrowPressEvent();
         this.nextLookAtPointEvent();
-        //this.onClickOnBuilding();
+        this.buildingClickEnabled = false;
+        this.onClickOnBuilding();
+        this.createBuildingClickToggleButton();
         this.bubbles = []; // liste des bulles
         this.currentLookAtIndex = 0; // pour lookAt de plusieurs points
         this.lookAtDebugCubes = []; // pour lookAt de plusieurs points
@@ -23,6 +25,7 @@ export class GuidedVisit extends GuidedTour {
         if (this.currentIndex === index) return;
 
         this.currentLookAtIndex = 0; // reset si on change d'etape
+        this.setBuildingClickEnabled(false);
         this.removeMedia();
         this.removeDebugCubes(); // comme media mais cubes n'en sont pas
 
@@ -548,14 +551,16 @@ export class GuidedVisit extends GuidedTour {
      */
     onClickOnBuilding() {
         this.itownsView.domElement.addEventListener('click', async (event) => {
+            if (!this.buildingClickEnabled) return;
+            const mouseEvent = event;
             
             // FUNCTION CODE for only finding buildings:
             //let pickedObject = this.pickCityObject(event) ?? this.itownsView.pickTerrainCoordinates({ x: event.clientX, y: event.clientY });
             let pickedObjectType = null;
-            let pickedObject = this.pickCityObject(event);
+            let pickedObject = this.pickCityObject(mouseEvent);
 
             if (pickedObject == null) {
-                pickedObject = this.itownsView.pickTerrainCoordinates(event);
+                pickedObject = this.itownsView.pickTerrainCoordinates(mouseEvent);
                 pickedObjectType = 'terrain';
             }
             else {
@@ -565,20 +570,76 @@ export class GuidedVisit extends GuidedTour {
             let batchId = null;
 
             if (pickedObjectType === 'building') {
-                let batchId = this.getBatchIdFromIntersection(pickedObject);
+                batchId = this.getBatchIdFromIntersection(pickedObject);
                 // Use pickedObject.point for exact click location, could use center of building too
             }
-                const position = pickedObject ? (pickedObject.point ? pickedObject.point.clone() : new THREE.Vector3(pickedObject.x, pickedObject.y, pickedObject.z)) : null;
-                
-                // Get building info if possible
-                let title = batchId?"Building ": "Terrain";
 
-                let htmlContent = batchId?`<strong>${title}</strong><br>Batch ID: ${batchId}`:
-                 `<strong>${title}</strong><br>Coordinates: ${position.x.toFixed(2)}, ${position.y.toFixed(2)}, ${position.z.toFixed(2)}`;
+            const position = pickedObject ? (pickedObject.point ? pickedObject.point.clone() : new THREE.Vector3(pickedObject.x, pickedObject.y, pickedObject.z)) : null;
+            console.log("pickedObject: ", pickedObject, "position: ", position, "batchId: ", batchId);
+            // Get building info if possible
+            let title = batchId ? "Building" : "Terrain";
 
-                // Create Bubble
-                this.createBubble(htmlContent, position);
+            let htmlContent = '';
+            if (batchId) {
+                htmlContent += `<strong>${title}</strong>: Batch ID: ${batchId}`;
+            }
+            if (position) {
+                const coords = `${position.x.toFixed(2)}, ${position.y.toFixed(2)}, ${position.z.toFixed(2)}`;
+                htmlContent += (htmlContent ? '<br>' : '') + `<strong>Coordinates</strong>: ${coords}`;
+            }
+            if (!htmlContent) htmlContent = 'No Batch ID or Coordinates';
+
+            // Create Bubble
+            this.createBubble(htmlContent, position);
         });
+    }
+
+    /**
+     * Crée un petit bouton pour activer/désactiver les clics sur les bâtiments.
+     * @return {void}
+     */
+    createBuildingClickToggleButton() {
+        if (this.buildingClickToggleButton) return;
+
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.style.position = 'absolute';
+        button.style.top = '8px';
+        button.style.left = '8px';
+        button.style.zIndex = '1000';
+        button.style.padding = '4px 8px';
+        button.style.fontSize = '12px';
+        button.style.lineHeight = '1';
+        button.style.cursor = 'pointer';
+
+        button.addEventListener('click', (event) => {
+            event.stopPropagation();
+            this.setBuildingClickEnabled(!this.buildingClickEnabled);
+        });
+
+        this.itownsView.domElement.appendChild(button);
+        this.buildingClickToggleButton = button;
+        this.updateBuildingClickToggleButton();
+    }
+
+    /**
+     * Active ou désactive les clics sur les bâtiments.
+     * @param  {boolean} enabled - État voulu.
+     * @return {void}
+     */
+    setBuildingClickEnabled(enabled) {
+        this.buildingClickEnabled = enabled;
+        this.updateBuildingClickToggleButton();
+    }
+
+    /**
+     * Met à jour le texte du bouton selon l'état courant.
+     * @return {void}
+     */
+    updateBuildingClickToggleButton() {
+        if (!this.buildingClickToggleButton) return;
+
+        this.buildingClickToggleButton.textContent = this.buildingClickEnabled ? 'Buildings: ON' : 'Buildings: OFF';
     }
 
     /**
