@@ -1,0 +1,31 @@
+{
+  "visits": [
+    {
+      "id": "FreeRoam",
+      "name": "FreeRoam",
+      "description": "Exploration libre d'une scène iTowns",
+      "steps": [
+        {
+          "id": 0,
+          "type": "image_step",
+          "layers": [
+            "Ortho_IGN",
+            "lyon_2018", 
+            "planar"
+          ],
+          "cameraPosition": {
+            "x": 1844924,
+            "y": 5175065,
+            "z": 300
+          },
+          "cameraRotation": {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "w": 1
+          }
+        }
+      ]
+    }
+  ]
+}

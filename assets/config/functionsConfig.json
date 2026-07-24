@@ -64,6 +64,13 @@
             "category": "Composition of functions",
             "config": "functionsCompositionConfigFolder/reconstructionVideoConfig.json",
             "status": "okay"
+        },
+        {
+            "id": "freeRoam",
+            "name": "Free Roam",
+            "category": "Exploration",
+            "config": "freeRoamConfig.json",
+            "status": "okay"
         }
     ]
 }
