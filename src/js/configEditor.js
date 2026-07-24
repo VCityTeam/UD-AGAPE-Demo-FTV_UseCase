@@ -708,6 +708,7 @@ function addMediaItem(stepIndex) {
         if (!Array.isArray(step.media)) {
             step.media = [];
         }
+        step.media.push({});
     });
 
     renderSteps();
