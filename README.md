@@ -268,13 +268,13 @@ You can use these controls:
 To get the camera position (where you are standing):
 
 ```javascript
-view.camera.camera3D.position
+guidedTour.itownsView.camera.camera3D.position
 ```
 
 To get the camera rotation (quaternion):
 
 ```javascript
-view.camera.camera3D.quaternion
+guidedTour.itownsView.camera.camera3D.quaternion
 ```
 
 Copy these values into your `visitConfig.json` or `mediaConfig.json` depending on your need.

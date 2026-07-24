@@ -40,6 +40,7 @@ async function init() {
         parsedConfigs.visitConfig.visits[0].steps[0].cameraPosition?.y ?? 5175050,
         parsedConfigs.visitConfig.visits[0].steps[0].cameraPosition?.z ?? 200
     );
+
     view.camera.camera3D.updateMatrixWorld(true);
 
     // Pour debug
