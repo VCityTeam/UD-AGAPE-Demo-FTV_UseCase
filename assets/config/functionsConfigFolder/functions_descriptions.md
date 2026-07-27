@@ -34,7 +34,7 @@ Fichiers : `2dObjectPosConfig.json` et `3dObjectPosConfig.json`
 - Déclinaisons possibles :
    - Pose avec rotation : On peut imaginer décliner ces objets selon l'orientation souhaitée pour qu'ils soient couchés (plaqués au sol comme un tapis) ou dressés (comme un panneau pub).
 - Paramètres clés :
-   - `media` : Un tableau appelant les bons ID de médias, par ex `["2dImagePos"]` ou `["3dObjectPos"]`. La position/rotation de l'étape initiale (`cameraPosition` et `cameraRotation` en quaternion) peut servir de base pour la vue.
+   - `media` : Un tableau appelant les bons ID de médias, par ex `["part_dieu_derriere_gare"]` ou `["3dObjectPos"]`. La position/rotation de l'étape initiale (`cameraPosition` et `cameraRotation` en quaternion) peut servir de base pour la vue.
 
 ## Rotation de caméra autour d'un point (à développer)
 - Description : Fait tourner la caméra autour d'un point d'intérêt central (orbite).

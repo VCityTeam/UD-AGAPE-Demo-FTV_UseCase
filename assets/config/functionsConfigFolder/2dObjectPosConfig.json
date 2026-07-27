@@ -13,7 +13,7 @@
             "lyon_2018", 
             "planar"
           ],
-          "media": [{"id": "2dImagePos"}],
+          "media": [{"id": "part_dieu_derriere_gare", "position": {"x": 1844834, "y": 5175065, "z": 180}, "rotation":{"x": 0.505, "y": -0.505, "z": -0.505, "w": 0.505}, "scale": {"x": 0.1, "y": 0.1, "z": 0.1}}],
           "cameraPosition": {
             "x": 1844924,
             "y": 5175065,

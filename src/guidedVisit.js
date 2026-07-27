@@ -71,7 +71,7 @@ export class GuidedVisit extends GuidedTour {
      */
     addMedia(mediaIds) { //mediaIds deviens liste de mediasId + coordonnées voulues du média associé
         const mediaDivs = [];
-        for (const mediaId of mediaIds) { //mediasIds devient [{id:"2dImagePos",position: {x:1844924,y:5175065,z:150}}] par exemple
+        for (const mediaId of mediaIds) { //mediasIds devient [{id:"part_dieu_derriere_gare",position: {x:1844924,y:5175065,z:150}}] par exemple
             const media = this.getMediaById(mediaId.id); //cheche id du coup
             const copiedMedia = { ...media }; // Copie de l'objet media pour éviter de modifier l'original
             //on ajoute les infos en plus si besoin

@@ -31,7 +31,7 @@
             "lyon_2018",
             "planar"
           ],
-          "media": [{"id": "2dImagePos", "position": {"x": 1844601, "y": 5174636, "z": 200}, "scale": {"x": 0.4, "y": 0.4, "z": 0.4}}],
+          "media": [{"id": "part_dieu_derriere_gare", "position": {"x": 1844601, "y": 5174636, "z": 200}, "rotation":{"x": 0.505, "y": -0.505, "z": -0.505, "w": 0.505}, "scale": {"x": 0.4, "y": 0.4, "z": 0.4}}],
           "objectMovement": [
             {
               "objectId": "camera",
@@ -59,7 +59,7 @@
             "lyon_2018",
             "planar"
           ],
-          "media":[{"id": "2dImagePos", "position": {"x": 1844601, "y": 5174636, "z": 200}, "scale": {"x": 0.4, "y": 0.4, "z": 0.4}},{"id": "2dImagePos", "position": {"x": 1844561, "y": 5174936, "z": 200}, "scale": {"x": 0.4, "y": 0.4, "z": 0.4}}],
+          "media":[{"id": "part_dieu_derriere_gare", "position": {"x": 1844601, "y": 5174636, "z": 200},"rotation":{"x": 0.505, "y": -0.505, "z": -0.505, "w": 0.505}, "scale": {"x": 0.4, "y": 0.4, "z": 0.4}},{"id": "part_dieu_derriere_gare", "position": {"x": 1844561, "y": 5174936, "z": 200},"rotation":{"x": 0.505, "y": -0.505, "z": -0.505, "w": 0.505}, "scale": {"x": 0.4, "y": 0.4, "z": 0.4}}],
           "cameraLookAt": [{"x": 1844631, "y": 5174636, "z": 200},{"x": 1844631, "y": 5174936, "z": 200}]
         },
         {
@@ -69,7 +69,7 @@
             "lyon_2018",
             "planar"
           ],
-          "media": [{"id": "2dImagePos", "position": {"x": 1843894, "y": 5175313, "z": 350}, "scale": {"x": 0.75, "y": 0.75, "z": 0.75}}],
+          "media": [{"id": "part_dieu_derriere_gare", "position": {"x": 1843894, "y": 5175313, "z": 350},"rotation":{"x": 0.505, "y": -0.505, "z": -0.505, "w": 0.505}, "scale": {"x": 0.75, "y": 0.75, "z": 0.75}}],
           "cameraPosition": {"x": 1844277, "y": 5174802, "z": 300},
           "objectMovement": [
             {
@@ -112,7 +112,7 @@
             }
           ],
           "cameraLookAt": [{"x": 1844240, "y": 5174966, "z": 200}],
-          "objectLookAtCamera": ["2dImagePos"]
+          "objectLookAtCamera": ["part_dieu_derriere_gare"]
         },
         {
           "id": 5,
@@ -121,7 +121,7 @@
             "lyon_2018",
             "planar"
           ],
-          "media": [{"id": "2dImagePos", "position": {"x": 1844240, "y": 5174966, "z": 200}, "scale": {"x": 0.4, "y": 0.4, "z": 0.4}}],
+          "media": [{"id": "part_dieu_derriere_gare", "position": {"x": 1844240, "y": 5174966, "z": 200},"rotation":{"x": 0.505, "y": -0.505, "z": -0.505, "w": 0.505}, "scale": {"x": 0.4, "y": 0.4, "z": 0.4}}],
           "cameraLookAt": [{"x": 1844240, "y": 5174966, "z": 200}],
           "objectMovement": [
             {
@@ -147,7 +147,7 @@
             "lyon_2018",
             "planar"
           ],
-          "media": [{"id": "2dImagePos", "isFullScreen": true}]
+          "media": [{"id": "part_dieu_derriere_gare", "isFullScreen": true}]
         },
         {
           "id": 7,
@@ -156,7 +156,7 @@
             "lyon_2018",
             "planar"
           ],
-          "media": [{"id": "2dImagePos", "position": {"x": 1844105, "y": 51750009, "z": 200}, "scale": {"x": 0.2, "y": 0.2, "z": 0.2}}],
+          "media": [{"id": "part_dieu_derriere_gare", "position": {"x": 1844105, "y": 51750009, "z": 200}, "scale": {"x": 0.2, "y": 0.2, "z": 0.2}}],
           "objectMovement": [
             {
               "objectId": "camera",
@@ -182,7 +182,7 @@
             "lyon_2018",
             "planar"
           ],
-          "media": [{"id": "2dImagePos", "position": {"x": 1844095, "y": 5175009, "z": 200}, "scale": {"x": 0.2, "y": 0.2, "z": 0.2}}],
+          "media": [{"id": "part_dieu_derriere_gare", "position": {"x": 1844095, "y": 5175009, "z": 200},"rotation":{"x": 0.505, "y": -0.505, "z": -0.505, "w": 0.505}, "scale": {"x": 0.2, "y": 0.2, "z": 0.2}}],
           "description": "justement là les va et viens aerien/sol"
         },
         {
@@ -240,7 +240,7 @@
             "lyon_2018",
             "planar"
           ],
-          "media": [{"id": "2dImagePos", "position": {"x": 1844850, "y": 5175116, "z": 180}, "rotation": {"x": 0.707, "y": 0, "z": 0, "w": 0.707}, "scale": {"x": 0.4, "y": 0.4, "z": 0.4}}],
+          "media": [{"id": "part_dieu_derriere_gare", "position": {"x": 1844850, "y": 5175116, "z": 180}, "rotation": {"x": 0.707, "y": 0, "z": 0, "w": 0.707}, "scale": {"x": 0.4, "y": 0.4, "z": 0.4}}],
           "description": "1m20, vidéo passe en plein écran"
         },
         {
@@ -250,7 +250,7 @@
             "lyon_2018",
             "planar"
           ],
-          "media": [{"id": "2dImagePos", "isFullScreen": true}],
+          "media": [{"id": "part_dieu_derriere_gare", "isFullScreen": true}],
           "description": "1m20, vidéo passe en plein écran"
         },
         {
@@ -261,10 +261,10 @@
             "planar"
           ],
           "cameraPosition": {"x": 1843826, "y": 5175055, "z": 220},
-          "media": [{"id": "2dImagePos", "position": {"x": 1844100, "y": 5175043, "z": 215}, "rotation": {"x": 0.505,"y": -0.505,"z": -0.505,"w": 0.505}, "scale": {"x": 0.2, "y": 0.2, "z": 0.2}}],
+          "media": [{"id": "part_dieu_derriere_gare", "position": {"x": 1844100, "y": 5175043, "z": 215}, "rotation": {"x": 0.505,"y": -0.505,"z": -0.505,"w": 0.505}, "scale": {"x": 0.2, "y": 0.2, "z": 0.2}}],
           "objectMovement": [
             {
-              "objectId": "2dImagePos",
+              "objectId": "part_dieu_derriere_gare",
               "type": "spline",
               "pointsArray": [
                 {
@@ -286,7 +286,7 @@
             "lyon_2018",
             "planar"
           ],
-          "media": [{"id": "2dImagePos", "position": {"x": 1844800, "y": 5174943, "z": 410}, "scale": {"x": 0.8, "y": 0.8, "z": 0.8}}],
+          "media": [{"id": "part_dieu_derriere_gare", "position": {"x": 1844800, "y": 5174943, "z": 410},"rotation":{"x": 0.505, "y": -0.505, "z": -0.505, "w": 0.505}, "scale": {"x": 0.8, "y": 0.8, "z": 0.8}}],
           "objectMovement": [
             {
               "objectId": "camera",
@@ -311,7 +311,7 @@
             "lyon_2018",
             "planar"
           ],
-          "media": [{"id": "2dImagePos", "position": {"x": 1844658, "y": 5175124, "z": 1500}, "rotation": {"x": 0, "y": 1, "z": 0, "w": 0}, "scale": {"x": 1, "y": 1, "z": 1}}],
+          "media": [{"id": "part_dieu_derriere_gare", "position": {"x": 1844658, "y": 5175124, "z": 1500}, "rotation": {"x": 0, "y": 1, "z": 0, "w": 0}, "scale": {"x": 1, "y": 1, "z": 1}}],
           "objectMovement": [
             {
               "objectId": "camera",
@@ -336,7 +336,7 @@
             "lyon_2018",
             "planar"
           ],
-          "media": [{"id": "2dImagePos", "isFullScreen": true}],
+          "media": [{"id": "part_dieu_derriere_gare", "isFullScreen": true}],
           "description": "fEnormément de plein écran, donc vidéo en PE pendant tout le reste jusqu'au dézoom en p16"
         },
         {
@@ -363,7 +363,7 @@
             }
           ],
           "cameraLookAt": [{"x": 1844700, "y": 5175065, "z": 170}],
-          "media": [{"id": "2dImagePos", " position": {"x": 1844800, "y": 5175065, "z": 200}, "rotation": {"x": 0.505, "y": -0.505, "z": -0.505, "w": 0.505}, "scale": {"x": 0.3, "y": 0.3, "z": 0.3}}]
+          "media": [{"id": "part_dieu_derriere_gare", " position": {"x": 1844800, "y": 5175065, "z": 200}, "rotation": {"x": 0.505, "y": -0.505, "z": -0.505, "w": 0.505}, "scale": {"x": 0.3, "y": 0.3, "z": 0.3}}]
         }
       ]
     }
