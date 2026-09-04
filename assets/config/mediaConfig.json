@@ -3,7 +3,12 @@
     {
       "id": "part_dieu_derriere_gare",
       "type": "image",
-      "value": "../assets/media/images/part_dieu_derriere_gare.png"
+      "value": "../assets/media/images/part_dieu_derriere_gare.png",
+      "position": {
+        "x": 1844620,
+        "y": 5175092,
+        "z": 180
+      }
     },
     {
       "id": "white_cube",
