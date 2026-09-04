@@ -43,6 +43,7 @@ export class GuidedVisit extends GuidedTour {
         this.currentLookAtIndex = 0;
         this.buildingInteraction.setBuildingClickEnabled(false);
         this.interactiveObjectController.disable();
+        this.updateInteractiveToggleButton();
         this.mediaManager.removeMedia();
         this.removeDebugCubes();
         this.animationController.stopCameraAnimation();
@@ -241,44 +242,152 @@ export class GuidedVisit extends GuidedTour {
     }
 
     /**
-     * Create UI button to toggle interactive mode on/off
-     * Button positioned in top-right corner, next to buildings button
+     * Create the interactive mode panel: the on/off toggle, the tool selector
+     * (move / height / rotate / scale) and the actions on the current selection.
      * @return {void}
      */
     createInteractiveToggleButton() {
-        if (this.interactiveToggleButton) return;
+        if (this.interactivePanel) return;
 
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.style.position = 'absolute';
-        button.style.top = '40px';
-        button.style.left = '8px';
-        button.style.zIndex = '1000';
-        button.style.padding = '4px 8px';
-        button.style.fontSize = '12px';
-        button.style.lineHeight = '1';
-        button.style.cursor = 'pointer';
+        const panel = document.createElement('div');
+        panel.className = 'interactive_panel';
 
-        button.addEventListener('click', (event) => {
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'interactive_panel_toggle';
+        toggle.addEventListener('click', (event) => {
             event.stopPropagation();
             this.toggleInteractiveMode();
             this.updateInteractiveToggleButton();
         });
+        panel.appendChild(toggle);
 
-        this.itownsView.domElement.appendChild(button);
-        this.interactiveToggleButton = button;
+        const tools = document.createElement('div');
+        tools.className = 'interactive_panel_tools';
+
+        this.interactiveToolButtons = {};
+        const toolLabels = {
+            move: 'Déplacer',
+            height: 'Hauteur',
+            rotate: 'Tourner',
+            scale: 'Taille'
+        };
+
+        for (const [tool, label] of Object.entries(toolLabels)) {
+            const toolButton = document.createElement('button');
+            toolButton.type = 'button';
+            toolButton.className = 'interactive_panel_tool';
+            toolButton.textContent = label;
+            toolButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                this.interactiveObjectController.setActiveTool(tool);
+                this.updateInteractiveToggleButton();
+            });
+
+            tools.appendChild(toolButton);
+            this.interactiveToolButtons[tool] = toolButton;
+        }
+        panel.appendChild(tools);
+
+        const actions = document.createElement('div');
+        actions.className = 'interactive_panel_actions';
+
+        const resetButton = document.createElement('button');
+        resetButton.type = 'button';
+        resetButton.className = 'interactive_panel_action';
+        resetButton.textContent = 'Réinitialiser';
+        resetButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            this.interactiveObjectController.resetSelectedTransform();
+        });
+        actions.appendChild(resetButton);
+
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.className = 'interactive_panel_action';
+        deleteButton.textContent = 'Supprimer';
+        deleteButton.addEventListener('click', (event) => {
+            event.stopPropagation();
+            this.interactiveObjectController.removeSelectedObject();
+        });
+        actions.appendChild(deleteButton);
+
+        panel.appendChild(actions);
+
+        const info = document.createElement('p');
+        info.className = 'interactive_panel_info';
+        panel.appendChild(info);
+
+        this.itownsView.domElement.appendChild(panel);
+
+        this.interactivePanel = panel;
+        this.interactiveToggleButton = toggle;
+        this.interactivePanelInfo = info;
+
+        this.createCopyTransformButton();
+
+        // Keep the panel in sync with what the controller is doing.
+        this.interactiveObjectController.onSelectionChange = () =>
+            this.updateInteractiveToggleButton();
+
         this.updateInteractiveToggleButton();
     }
 
     /**
-     * Update interactive toggle button text based on current state
+     * Refresh the panel: toggle label, active tool highlight and selection info
      * @return {void}
      */
     updateInteractiveToggleButton() {
         if (!this.interactiveToggleButton) return;
-        this.interactiveToggleButton.textContent = this.interactiveObjectController.enabled 
-            ? 'Interactive: ON' 
+
+        const controller = this.interactiveObjectController;
+        const enabled = controller.enabled;
+
+        this.interactiveToggleButton.textContent = enabled
+            ? 'Interactive: ON'
             : 'Interactive: OFF';
+
+        if (this.interactivePanel) {
+            this.interactivePanel.classList.toggle('disabled', !enabled);
+        }
+
+        if (this.interactiveToolButtons) {
+            for (const [tool, button] of Object.entries(this.interactiveToolButtons)) {
+                button.classList.toggle('active', controller.activeTool === tool);
+                button.disabled = !enabled;
+            }
+        }
+
+        if (this.copyTransformButton) {
+            this.copyTransformButton.disabled = !controller.selectedObject;
+        }
+
+        if (this.interactivePanelInfo) {
+            this.interactivePanelInfo.textContent = this._interactiveInfoText();
+        }
+    }
+
+    /**
+     * Build the hint line shown under the tools.
+     * @return {string} - Hint describing the selection and the shortcuts
+     */
+    _interactiveInfoText() {
+        const controller = this.interactiveObjectController;
+
+        if (!controller.enabled) {
+            return 'Activer pour sélectionner et déplacer les médias de la scène.';
+        }
+
+        const selected = controller.selectedObject;
+        if (!selected) {
+            return 'Cliquer un média pour le sélectionner. Raccourcis: Maj = hauteur, R = rotation, S = taille (molette).';
+        }
+
+        const scale = selected.scale.x.toFixed(2);
+        const altitude = selected.position.z.toFixed(1);
+
+        return `Sélection: ${selected.userData.mediaId} — altitude ${altitude} m, échelle ×${scale}. `
+            + 'Maj = hauteur, R = rotation, S = taille (molette), Suppr = supprimer.';
     }
 
     /**
@@ -290,33 +399,16 @@ export class GuidedVisit extends GuidedTour {
 
         const button = document.createElement('button');
         button.type = 'button';
-
-        button.style.position = 'absolute';
-        button.style.bottom = '40px';
-        button.style.left = '8px';
-        button.style.zIndex = '1000';
-        button.style.padding = '4px 8px';
-        button.style.fontSize = '12px';
-        button.style.lineHeight = '1';
-        button.style.cursor = 'pointer';
-
+        button.className = 'interactive_panel_action';
         button.textContent = 'Copy Transform';
 
         button.addEventListener('click', (event) => {
             event.stopPropagation();
-
-            const selectedObject =
-                this.interactiveObjectController.selectedObject;
-
-            if (!selectedObject) {
-                console.warn('No object selected to copy transform from.');
-                return;
-            }
-
             this.interactiveObjectController.copySelectedTransformToClipboard();
         });
 
-        this.itownsView.domElement.appendChild(button);
+        const actions = this.interactivePanel?.querySelector('.interactive_panel_actions');
+        (actions || this.itownsView.domElement).appendChild(button);
 
         this.copyTransformButton = button;
     }

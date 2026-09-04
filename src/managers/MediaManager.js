@@ -128,6 +128,14 @@ export class MediaManager {
         );
 
         object.scale.set(scale.x, scale.y, scale.z);
+
+        // Remembered so the interactive controller can restore the media to the
+        // orientation and size it was configured with.
+        object.userData.initialTransform = {
+            position: { ...position },
+            rotation: { ...rotation },
+            scale: { ...scale }
+        };
     }
 
     /**
@@ -149,7 +157,9 @@ export class MediaManager {
      * @return {void}
      */
     _finalizeMedia(object, { type, mediaId, trajectory }) {
-        object.userData = { isMedia: true, type, mediaId };
+        // Merge: some media set user data before this call (video stop handler,
+        // blob URL of an uploaded file...) and overwriting would drop it.
+        Object.assign(object.userData, { isMedia: true, type, mediaId });
 
         const currentStep = this.guidedVisit.getCurrentStep();
         if (currentStep?.objectLookAtCamera?.includes(mediaId)) {
@@ -348,6 +358,42 @@ export class MediaManager {
                     resolve(fileDiv);
                 });
         });
+    }
+
+    /**
+     * Removes a single media object from the scene and releases its resources.
+     * Unlike removeMedia(), this is a definitive deletion: a blob URL created for
+     * an uploaded file is revoked here.
+     * @param  {THREE.Object3D} object - Media object to remove
+     * @return {void}
+     */
+    removeMediaObject(object) {
+        if (!object) return;
+
+        if (object.userData?.stop) {
+            object.userData.stop();
+        }
+
+        object.traverse((child) => {
+            if (child.material) {
+                const materials = Array.isArray(child.material) ? child.material : [child.material];
+                materials.forEach((material) => {
+                    if (material.map) material.map.dispose();
+                    material.dispose();
+                });
+            }
+            if (child.geometry) {
+                child.geometry.dispose();
+            }
+        });
+
+        if (object.userData?.objectUrl) {
+            URL.revokeObjectURL(object.userData.objectUrl);
+        }
+
+        object.removeFromParent();
+        this.loadedMedias = this.loadedMedias.filter((media) => media !== object);
+        this.view.notifyChange();
     }
 
     /**

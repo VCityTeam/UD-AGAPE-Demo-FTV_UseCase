@@ -145,6 +145,7 @@ body {
 .editor_form_panel input,
 .editor_form_panel textarea,
 .editor_form_panel select,
+.editor_sidebar .editor_panel select,
 .step_field input,
 .step_field textarea,
 .step_field select {
