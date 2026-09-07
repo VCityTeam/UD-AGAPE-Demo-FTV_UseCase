@@ -49,7 +49,22 @@
                 <input id="media_json_import_input" type="file" accept="application/json,.json">
                 <label class="editor_file_button" for="media_upload_input">Ajouter un média depuis un fichier</label>
                 <input id="media_upload_input" type="file" accept="image/*,video/*,text/*,.gltf,.glb,.obj,.fbx,application/json,.json">
+                <button class="editor_button editor_button_accent" id="download_media_files_button">Télécharger les fichiers médias</button>
                 <button class="editor_button editor_button_secondary" id="reset_media_button">Réinitialiser les médias</button>
+            </div>
+
+            <div class="editor_panel">
+                <h2>Visites enregistrées</h2>
+                <select id="visit_library_select"></select>
+                <button class="editor_button editor_button_accent" id="load_library_visit_button" type="button">Charger</button>
+                <button class="editor_button editor_button_accent" id="preview_library_visit_button" type="button">Voir dans le hub</button>
+                <button class="editor_button editor_button_secondary" id="delete_library_visit_button" type="button">Supprimer</button>
+                <button class="editor_button editor_button_accent" id="save_library_visit_button" type="button">Enregistrer sous...</button>
+            </div>
+
+            <div class="editor_panel">
+                <h2>Prévisualisation</h2>
+                <button class="editor_button editor_button_accent" id="preview_in_hub_button" type="button">Prévisualiser dans le hub</button>
             </div>
 
             <div class="editor_status" id="editor_status">Prêt.</div>
@@ -98,6 +113,8 @@
         </main>
     </div>
 
+    <script defer src="../src/js/mediaStore.js"></script>
+    <script defer src="../src/js/visitLibrary.js"></script>
     <script defer src="../src/js/configEditor.js"></script>
 </body>
 </html>

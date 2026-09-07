@@ -69,6 +69,12 @@ const VISIT_CONFIG_LOCALSTORAGE_KEY = 'agape_demo_visit_config';
 
 const MEDIA_CONFIG_LOCALSTORAGE_KEY = 'agape_demo_media_config';
 
+/** Valeur de ?demo= qui demande au hub de lire le brouillon courant. */
+const HUB_LOCAL_CONFIG_VALUE = '__local__';
+
+/** Préfixe de ?demo= pour ouvrir une visite enregistrée dans la bibliothèque. */
+const HUB_LOCAL_CONFIG_PREFIX = 'local:';
+
 function defaultMediaState() {
     return {
         media: [],
@@ -169,7 +175,19 @@ function serializeMediaItem(media) {
         type: media.type,
     };
 
-    payload.value = media.value;
+    payload.value = media.assetPath || media.value;
+
+    if (media.assetPath) {
+        payload.assetPath = media.assetPath;
+    }
+    if (media.fileName) {
+        payload.fileName = media.fileName;
+    }
+    // Clé du dépôt local: permet au hub d'afficher le média avant que le fichier
+    // ne soit copié dans assets/. Ignorée si le dépôt ne la connaît pas.
+    if (media.storageKey) {
+        payload.storageKey = media.storageKey;
+    }
     if ('isFullScreen' in media) {
         payload.isFullScreen = Boolean(media.isFullScreen);
     }
@@ -195,23 +213,37 @@ function buildMediaValueFromItem(media) {
         text: 'txt',
     };
 
+    // Folder names as they actually exist under assets/media, which do not always
+    // match the media type (type 'image' lives in 'images').
+    const typeFolders = {
+        image: 'images',
+        video: 'videos',
+        audio: 'audios',
+        obj3d: 'obj3d',
+        text: 'texts',
+    };
+
     const extension = typeExtensions[media.type] || 'file';
+    const folder = typeFolders[media.type] || media.type || 'file';
 
     if (media.fileName) {
         const fileName = media.fileName.includes('.') ? media.fileName : `${media.fileName}.${extension}`;
-        return `../assets/media/${media.type || 'file'}/${fileName}`;
+        return `../assets/media/${folder}/${fileName}`;
     }
 
     if (media.id) {
         const fileName = media.id.includes('.') ? media.id : `${media.id}.${extension}`;
-        return `../assets/media/${media.type || 'file'}/${fileName}`;
+        return `../assets/media/${folder}/${fileName}`;
     }
 
-    return `../assets/media/${media.type || 'file'}/`;
+    return `../assets/media/${folder}/`;
 }
 
 function syncMediaValue(media) {
-    media.value = buildMediaValueFromItem(media);
+    // L'éditeur n'affiche pas les médias: `value` et `assetPath` y sont identiques.
+    // C'est le hub qui remplace `value` par une URL vivante à l'exécution.
+    media.assetPath = buildMediaValueFromItem(media);
+    media.value = media.assetPath;
 }
 
 function detectMediaTypeFromFile(file) {
@@ -243,7 +275,23 @@ function addMediaFromFile(file) {
     mediaState.media.push(item);
     mediaState.selectedIndex = mediaState.media.length - 1;
     renderMediaConfigs();
-    setStatus(`Média ajouté: ${file.name}`);
+
+    // Les octets sont conservés dans le dépôt partagé: le hub peut afficher le
+    // média tout de suite, sans attendre que le fichier soit déposé dans assets/.
+    if (!window.mediaStore) {
+        setStatus(`Média ajouté: ${file.name} (dépôt indisponible, place le fichier dans ${item.assetPath}).`);
+        return;
+    }
+
+    window.mediaStore.put(id, file)
+        .then(() => {
+            item.storageKey = id;
+            renderMediaConfigs();
+            setStatus(`Média ajouté et stocké: ${file.name}. Visible dans le hub sans copie de fichier.`);
+        })
+        .catch((error) => {
+            setStatus(`Média ajouté mais non stocké (${error.message}). Place le fichier dans ${item.assetPath}.`, true);
+        });
 }
 
 function renderMediaConfigs() {
@@ -1400,6 +1448,187 @@ function downloadMediaJson() {
     setStatus(`JSON téléchargé: ${link.download}`);
 }
 
+/**
+ * Sauvegarde les deux configurations puis ouvre le hub sur la visite locale.
+ * Le hub lit les mêmes clés de localStorage (même origine), aucun fichier n'est écrit.
+ * @return {Promise<void>}
+ */
+async function previewInHub() {
+    // Idem côté éditeur: attendre les écritures du dépôt avant de quitter la page.
+    await window.mediaStore?.whenIdle();
+
+    const visitSaved = saveVisitConfigsToLocalStorage();
+    const mediaSaved = saveMediaConfigsToLocalStorage();
+
+    if (!visitSaved || !mediaSaved) {
+        setStatus('Prévisualisation annulée: la sauvegarde dans le localStorage a échoué.', true);
+        return;
+    }
+
+    setStatus('Ouverture du hub avec la visite en cours...');
+    window.location.href = `hub_demos.html?demo=${HUB_LOCAL_CONFIG_VALUE}`;
+}
+
+/**
+ * Ressort du dépôt local les fichiers importés, pour pouvoir les déposer dans
+ * assets/media/. Le nom de téléchargement correspond au chemin attendu par la
+ * configuration exportée.
+ * @return {Promise<void>}
+ */
+async function downloadMediaFiles() {
+    if (!window.mediaStore) {
+        setStatus('Dépôt de médias indisponible dans ce navigateur.', true);
+        return;
+    }
+
+    const stored = mediaState.media.filter((media) => media.storageKey);
+    if (stored.length === 0) {
+        setStatus('Aucun fichier importé à télécharger.');
+        return;
+    }
+
+    let downloaded = 0;
+
+    for (const media of stored) {
+        const record = await window.mediaStore.get(media.storageKey);
+        if (!record?.blob) continue;
+
+        const url = URL.createObjectURL(record.blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = record.fileName || media.id;
+        link.click();
+        URL.revokeObjectURL(url);
+        downloaded += 1;
+    }
+
+    setStatus(
+        `${downloaded} fichier(s) téléchargé(s). À placer dans assets/media/ `
+        + 'selon les chemins du JSON exporté.'
+    );
+}
+
+/**
+ * Configurations courantes, au format attendu par le hub.
+ * @return {{visitConfig: object, mediaConfig: object}}
+ */
+function currentConfigs() {
+    return {
+        visitConfig: clone(state),
+        mediaConfig: { medias: mediaState.media.map(serializeMediaItem) }
+    };
+}
+
+/**
+ * Remplit la liste déroulante des visites enregistrées.
+ * @return {void}
+ */
+function renderVisitLibrary() {
+    const select = elements.visitLibrarySelect;
+    if (!select || !window.visitLibrary) return;
+
+    const previous = select.value;
+    const entries = window.visitLibrary.list();
+
+    select.replaceChildren();
+    entries.forEach((entry) => {
+        const option = document.createElement('option');
+        option.value = entry.id;
+        option.textContent = `${entry.name} (${new Date(entry.savedAt).toLocaleString()})`;
+        select.appendChild(option);
+    });
+
+    select.disabled = entries.length === 0;
+    if (entries.some((entry) => entry.id === previous)) {
+        select.value = previous;
+    }
+}
+
+/**
+ * Enregistre la visite courante sous un nom, à côté des précédentes.
+ * @return {Promise<void>}
+ */
+async function saveVisitToLibrary() {
+    if (!window.visitLibrary) {
+        setStatus('Bibliothèque de visites indisponible.', true);
+        return;
+    }
+
+    // Les octets d'un média encore en cours d'écriture doivent être dans le dépôt
+    // avant que la visite ne les référence.
+    await window.mediaStore?.whenIdle();
+
+    const suggested = currentVisit().name || 'Visite';
+    const name = window.prompt('Nom de la visite à enregistrer:', suggested);
+    if (name === null) return;
+
+    const { visitConfig, mediaConfig } = currentConfigs();
+    const entry = window.visitLibrary.save({ name: name.trim() || suggested, visitConfig, mediaConfig });
+
+    if (!entry) {
+        setStatus('Enregistrement impossible (stockage plein ou indisponible).', true);
+        return;
+    }
+
+    renderVisitLibrary();
+    elements.visitLibrarySelect.value = entry.id;
+    setStatus(`Visite enregistrée: ${entry.name}. Visible dans le hub.`);
+}
+
+/**
+ * Recharge dans l'éditeur une visite enregistrée.
+ * @return {void}
+ */
+function loadVisitFromLibrary() {
+    const id = elements.visitLibrarySelect?.value;
+    const loaded = id && window.visitLibrary?.load(id);
+
+    if (!loaded) {
+        setStatus('Aucune visite sélectionnée.', true);
+        return;
+    }
+
+    state.visits = normalizeImportedState(loaded.visitConfig).visits;
+    mediaState.media = normalizeMediaState(loaded.mediaConfig).media;
+    mediaState.selectedIndex = 0;
+    uiState.selectedStepIndex = 0;
+    renderAll();
+    setStatus(`Visite chargée: ${loaded.entry.name}.`);
+}
+
+/**
+ * Ouvre directement une visite enregistrée dans le hub.
+ * @return {void}
+ */
+function previewLibraryVisitInHub() {
+    const id = elements.visitLibrarySelect?.value;
+    if (!id) {
+        setStatus('Aucune visite sélectionnée.', true);
+        return;
+    }
+
+    window.location.href = `hub_demos.html?demo=${HUB_LOCAL_CONFIG_PREFIX}${id}`;
+}
+
+/**
+ * Supprime une visite enregistrée.
+ * @return {void}
+ */
+function deleteVisitFromLibrary() {
+    const id = elements.visitLibrarySelect?.value;
+    if (!id) {
+        setStatus('Aucune visite sélectionnée.', true);
+        return;
+    }
+
+    const entry = window.visitLibrary.list().find((item) => item.id === id);
+    if (!window.confirm(`Supprimer la visite "${entry?.name || id}" ?`)) return;
+
+    window.visitLibrary.remove(id);
+    renderVisitLibrary();
+    setStatus('Visite supprimée.');
+}
+
 function saveVisitConfigsToLocalStorage() {
     try {
         const visitPayload = clone(state);
@@ -1407,8 +1636,10 @@ function saveVisitConfigsToLocalStorage() {
         localStorage.setItem(VISIT_CONFIG_LOCALSTORAGE_KEY, JSON.stringify(visitPayload));
 
         setStatus('Configuration visite sauvegardée dans le localStorage.');
+        return true;
     } catch (error) {
         setStatus(`Impossible de sauvegarder la configuration visite dans le localStorage: ${error.message}`, true);
+        return false;
     }
 }
 
@@ -1421,8 +1652,10 @@ function saveMediaConfigsToLocalStorage() {
         localStorage.setItem(MEDIA_CONFIG_LOCALSTORAGE_KEY, JSON.stringify(mediaPayload));
 
         setStatus('Configuration média sauvegardée dans le localStorage.');
+        return true;
     } catch (error) {
         setStatus(`Impossible de sauvegarder la configuration média dans le localStorage: ${error.message}`, true);
+        return false;
     }
 }
 
@@ -1530,6 +1763,24 @@ function bindEvents() {
     if (elements.saveMediaButton) {
         elements.saveMediaButton.addEventListener('click', saveMediaConfigsToLocalStorage);
     }
+    if (elements.saveLibraryVisitButton) {
+        elements.saveLibraryVisitButton.addEventListener('click', saveVisitToLibrary);
+    }
+    if (elements.loadLibraryVisitButton) {
+        elements.loadLibraryVisitButton.addEventListener('click', loadVisitFromLibrary);
+    }
+    if (elements.previewLibraryVisitButton) {
+        elements.previewLibraryVisitButton.addEventListener('click', previewLibraryVisitInHub);
+    }
+    if (elements.deleteLibraryVisitButton) {
+        elements.deleteLibraryVisitButton.addEventListener('click', deleteVisitFromLibrary);
+    }
+    if (elements.downloadMediaFilesButton) {
+        elements.downloadMediaFilesButton.addEventListener('click', downloadMediaFiles);
+    }
+    if (elements.previewInHubButton) {
+        elements.previewInHubButton.addEventListener('click', previewInHub);
+    }
     elements.resetButton.addEventListener('click', resetEditor);
     if (elements.resetMediaButton) {
         elements.resetMediaButton.addEventListener('click', resetMediaEditor);
@@ -1585,6 +1836,13 @@ function init() {
     elements.downloadMediaButton = document.getElementById('download_media_json_button');
     elements.saveVisitButton = document.getElementById('save_visit_localstorage_button');
     elements.saveMediaButton = document.getElementById('save_media_localstorage_button');
+    elements.previewInHubButton = document.getElementById('preview_in_hub_button');
+    elements.downloadMediaFilesButton = document.getElementById('download_media_files_button');
+    elements.visitLibrarySelect = document.getElementById('visit_library_select');
+    elements.saveLibraryVisitButton = document.getElementById('save_library_visit_button');
+    elements.loadLibraryVisitButton = document.getElementById('load_library_visit_button');
+    elements.previewLibraryVisitButton = document.getElementById('preview_library_visit_button');
+    elements.deleteLibraryVisitButton = document.getElementById('delete_library_visit_button');
     elements.importInput = document.getElementById('json_import_input');
     elements.mediaImportInput = document.getElementById('media_json_import_input');
     elements.mediaUploadInput = document.getElementById('media_upload_input');
@@ -1607,6 +1865,7 @@ function init() {
     loadVisitConfigsFromLocalStorage();
     loadMediaConfigsFromLocalStorage();
 
+    renderVisitLibrary();
     bindEvents();
     setEditorMode('visit');
     renderAll();
