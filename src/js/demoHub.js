@@ -13,7 +13,7 @@ const LOCAL_CONFIG_PREFIX = "local:";
 const VISIT_CONFIG_LOCALSTORAGE_KEY = "agape_demo_visit_config";
 const MEDIA_CONFIG_LOCALSTORAGE_KEY = "agape_demo_media_config";
 
-const DEFAULT_VISIT_CONFIG = "../assets/config/functionsConfigFolder/cameraLookAtPointConfig.json";
+const DEFAULT_VISIT_CONFIG = "../assets/config/freeRoamConfig.json";
 
 /** Id de la visite enregistrée demandée, ou null si ce n'est pas le cas. */
 const localVisitId = selectedDemo?.startsWith(LOCAL_CONFIG_PREFIX)
