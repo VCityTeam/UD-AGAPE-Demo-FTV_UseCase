@@ -30,6 +30,12 @@ export class GuidedVisit extends GuidedTour {
         this.buildingInteraction.createBuildingClickToggleButton();
         this.createInteractiveToggleButton();
         this.createCopyTransformButton();
+
+        // Playback control for automatic steps
+        this.automaticPlayback = Boolean(config.automatic);
+        this.defaultStepDuration = config.defaultStepDuration;
+        this.automaticPlaybackTimer = null;
+        this.isChangingStep = false;
     }
 
     /**
@@ -39,42 +45,60 @@ export class GuidedVisit extends GuidedTour {
      */
     async goToStep(index) {
         if (this.currentIndex === index) return;
+        if (this.isChangingStep) return;
 
-        this.currentLookAtIndex = 0;
-        this.buildingInteraction.setBuildingClickEnabled(false);
-        this.interactiveObjectController.disable();
-        this.updateInteractiveToggleButton();
-        this.mediaManager.removeMedia();
-        this.removeDebugCubes();
-        this.animationController.stopCameraAnimation();
+        this.isChangingStep = true;
 
-        this.currentIndex = index;
-        const step = this.getCurrentStep();
-        console.log("je passe dans goToStep", "nouveau step: ", step)
-
-        if (step.media && step.media.length > 0) {
-            this.mediaManager.addMedia(step.media);
-        }
-
-        if (step.cameraPosition || step.cameraRotation) {
-            this.animationController.cameraToPosition(step.cameraPosition, step.cameraRotation);
-        }
-
-        if (step.layers && step.layers.length > 0) {
-            this.filterLayers(step.layers);
-        }
-        if (step.objectMovement && step.objectMovement.length > 0) {
-            for (const objectMovement of step.objectMovement) {
-                this.animationController.animateObjectAlongTrajectory(objectMovement.objectId, objectMovement);
-            }
-        }
-        else if (step.cameraMovement && step.cameraMovement.type == 'rotation') {
-            this.animationController.rotateCamera(step.cameraMovement);
-        }
-        else if (step.cameraLookAt && step.cameraLookAt.length > 0) {
+        try {
             this.currentLookAtIndex = 0;
-            this.animationController.cameraLookAtSmooth(step.cameraLookAt[0]);
-            this.createDebugCubes(step.cameraLookAt);
+            this.buildingInteraction.setBuildingClickEnabled(false);
+            this.interactiveObjectController.disable();
+            this.updateInteractiveToggleButton();
+            this.mediaManager.removeMedia();
+            this.removeDebugCubes();
+            this.animationController.stopCameraAnimation();
+
+            this.currentIndex = index;
+            const step = this.getCurrentStep();
+            console.log("je passe dans goToStep", "nouveau step: ", step)
+
+            if (step.media && step.media.length > 0) {
+                this.mediaManager.addMedia(step.media);
+            }
+
+            if (step.cameraPosition || step.cameraRotation) {
+                this.animationController.cameraToPosition(step.cameraPosition, step.cameraRotation);
+            }
+
+            if (step.layers && step.layers.length > 0) {
+                this.filterLayers(step.layers);
+            }
+            if (step.objectMovement && step.objectMovement.length > 0) {
+                for (const objectMovement of step.objectMovement) {
+                    this.animationController.animateObjectAlongTrajectory(objectMovement.objectId, objectMovement);
+                }
+            }
+            if (step.cameraLookAtObject) {
+                this.currentLookAtIndex = 0;
+                const objectTargets = Array.isArray(step.cameraLookAtObject)
+                    ? step.cameraLookAtObject
+                    : [step.cameraLookAtObject];
+                this.animationController.cameraLookAtObjectSmooth(
+                    objectTargets[0]
+                );
+            }
+            else if (!step.objectMovement &&
+                step.cameraMovement &&
+                step.cameraMovement.type == 'rotation') {
+                this.animationController.rotateCamera(step.cameraMovement);
+            }
+            else if (!step.objectMovement && step.cameraLookAt && step.cameraLookAt.length > 0) {
+                this.currentLookAtIndex = 0;
+                this.animationController.cameraLookAtSmooth(step.cameraLookAt[0]);
+                this.createDebugCubes(step.cameraLookAt);
+            }
+        } finally {
+            this.isChangingStep = false; //On force l'état à "non"
         }
     }
 
@@ -86,17 +110,60 @@ export class GuidedVisit extends GuidedTour {
      */
     nextStepArrowPressEvent() {
         this.itownsView.domElement.addEventListener('keydown', async (event) => {
-            const currentStep = this.getCurrentStep();
-            if (event.key === 'ArrowRight') {
-                if (currentStep.id + 1 < this.steps.length) { // ex: currentStep : Object { id:0, type: "half", layers: (3) […], media: (1) […] }
-                    await this.goToStep(currentStep.id + 1);
-                }
-            } else if (event.key === 'ArrowLeft') {
-                if (currentStep.id - 1 >= 0) {
-                    await this.goToStep(currentStep.id - 1);
-                }
-            }
-        }, false);
+        const currentStep = this.getCurrentStep();
+        if (!currentStep) return;
+
+        let nextIndex = null;
+
+        if (event.key === 'ArrowRight' && currentStep.id + 1 < this.steps.length) {
+            nextIndex = currentStep.id + 1;
+        } else if (event.key === 'ArrowLeft' && currentStep.id - 1 >= 0) {
+            nextIndex = currentStep.id - 1;
+        }
+
+        if (nextIndex === null) return;
+
+        this.stopAutomaticPlayback();
+        await this.goToStep(nextIndex);
+
+        if (this.automaticPlayback) {
+            this.scheduleNextAutomaticStep();
+        }
+    }, false);
+    }
+
+    stopAutomaticPlayback() {
+        if (this.automaticPlaybackTimer !== null) {
+            clearTimeout(this.automaticPlaybackTimer);
+            this.automaticPlaybackTimer = null;
+        }
+    }
+
+    startAutomaticPlayback() {
+        this.stopAutomaticPlayback();
+        if (!this.automaticPlayback || this.steps.length === 0) return;
+        this.scheduleNextAutomaticStep();
+    }
+
+    scheduleNextAutomaticStep() {
+        this.stopAutomaticPlayback();
+
+        const currentStep = this.getCurrentStep();
+
+        if (!currentStep || currentStep.id + 1 >= this.steps.length) {
+            return;
+        }
+
+        const delay = currentStep.displayDuration
+            ?? this.defaultStepDuration
+            ?? 5000;
+
+        this.automaticPlaybackTimer = setTimeout(async () => {
+            this.automaticPlaybackTimer = null;
+
+            await this.goToStep(currentStep.id + 1);
+            this.scheduleNextAutomaticStep();
+        }, delay);
     }
 
     /**
@@ -108,27 +175,35 @@ export class GuidedVisit extends GuidedTour {
             if (event.key.toLowerCase() !== 'n') return;
 
             const step = this.getCurrentStep();
-            if (!step || !step.cameraLookAt || step.cameraLookAt.length === 0) {
+            const objectTargets = step?.cameraLookAtObject
+                ? (Array.isArray(step.cameraLookAtObject)
+                    ? step.cameraLookAtObject
+                    : [step.cameraLookAtObject])
+                : null;
+            const pointTargets = step?.cameraLookAt;
+            const targets = objectTargets || pointTargets;
+
+            if (!targets || targets.length === 0) {
                 return;
             }
 
             this.currentLookAtIndex =
-                (this.currentLookAtIndex + 1) % step.cameraLookAt.length;
+                (this.currentLookAtIndex + 1) % targets.length;
 
-            const nextPoint = step.cameraLookAt[this.currentLookAtIndex];
-
-            this.animationController.cameraLookAtSmooth(nextPoint, 1200);
+            if (objectTargets) {
+                this.animationController.cameraLookAtObjectSmooth(
+                    objectTargets[this.currentLookAtIndex],
+                    1200
+                );
+            } else {
+                this.animationController.cameraLookAtSmooth(
+                    pointTargets[this.currentLookAtIndex],
+                    1200
+                );
+            }
             this.itownsView.notifyChange();
         });
     }
-
-    // fetchFile is now in SceneUtils
-
-    // createMediaDiv is now in MediaManager
-
-    // Transform helpers are now in MediaManager
-
-    // Image, Video, and 3D object loading are now in MediaManager
 
     /**
      * Wrapper to create debug cubes using SceneUtils
@@ -180,6 +255,20 @@ export class GuidedVisit extends GuidedTour {
      */
     cameraLookAtSmooth(target, duration = 1200) {
         this.animationController.cameraLookAtSmooth(target, duration);
+    }
+
+    /**
+     * Wrapper for animationController.cameraLookAtObject
+     */
+    cameraLookAtObject(objectId) {
+        this.animationController.cameraLookAtObject(objectId);
+    }
+
+    /**
+     * Wrapper for animationController.cameraLookAtObjectSmooth
+     */
+    cameraLookAtObjectSmooth(objectId, duration = 1200) {
+        this.animationController.cameraLookAtObjectSmooth(objectId, duration);
     }
 
     /**

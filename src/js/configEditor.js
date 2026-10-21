@@ -52,6 +52,9 @@ function defaultState() {
                 id: 'visitConfig',
                 name: 'Visite 1',
                 description: 'Visite générée depuis l\'éditeur JSON.',
+                automatic: false,
+                defaultStepDuration: 5000,
+                loop: false,
                 steps: [defaultStepTemplates.basic(0)],
             },
         ],
@@ -592,6 +595,9 @@ function normalizeImportedState(importedState) {
     return {
         visits: importedState.visits.map((visit) => ({
             ...visit,
+            automatic: Boolean(visit.automatic),
+            defaultStepDuration: normalizeNumber(visit.defaultStepDuration, 5000),
+            loop: Boolean(visit.loop),
             steps: Array.isArray(visit.steps)
                 ? visit.steps.map(normalizeStep)
                 : [normalizeStep(defaultStepTemplates.basic(0))],
@@ -1212,6 +1218,21 @@ function renderStepCard(step, stepIndex) {
     }));
     fields.appendChild(createField('Layers', layersInput, 'step_field step_field_wide'));
 
+    const displayDurationInput = document.createElement('input');
+    displayDurationInput.type = 'number';
+    displayDurationInput.min = '0';
+    displayDurationInput.step = '100';
+    displayDurationInput.placeholder = 'Visite par défaut';
+    displayDurationInput.value = step.displayDuration ?? '';
+    displayDurationInput.addEventListener('input', () => updateStep(stepIndex, (draft) => {
+        if (displayDurationInput.value === '') {
+            delete draft.displayDuration;
+        } else {
+            draft.displayDuration = normalizeNumber(displayDurationInput.value, 5000);
+        }
+    }));
+    fields.appendChild(createField('Durée d’affichage (ms) - 1000ms = 1 seconde', displayDurationInput));
+
     card.appendChild(fields);
 
     const optionBar = document.createElement('div');
@@ -1347,6 +1368,9 @@ function renderVisitFields() {
     elements.visitId.value = currentVisit().id;
     elements.visitName.value = currentVisit().name;
     elements.visitDescription.value = currentVisit().description || '';
+    elements.visitAutomatic.checked = Boolean(currentVisit().automatic);
+    elements.visitDefaultStepDuration.value = currentVisit().defaultStepDuration ?? 5000;
+    elements.visitLoop.checked = Boolean(currentVisit().loop);
     elements.stepCount.textContent = `${currentSteps().length} étape(s)`;
 }
 
@@ -1466,7 +1490,7 @@ async function previewInHub() {
     }
 
     setStatus('Ouverture du hub avec la visite en cours...');
-    window.location.href = `hub_demos.html?demo=${HUB_LOCAL_CONFIG_VALUE}`;
+    window.location.href = `hub_demos.html?mode=editor&demo=${HUB_LOCAL_CONFIG_VALUE}`;
 }
 
 /**
@@ -1755,6 +1779,21 @@ function bindEvents() {
         currentVisit().description = elements.visitDescription.value;
     });
 
+    elements.visitAutomatic.addEventListener('change', () => {
+        currentVisit().automatic = elements.visitAutomatic.checked;
+    });
+
+    elements.visitDefaultStepDuration.addEventListener('input', () => {
+        currentVisit().defaultStepDuration = normalizeNumber(
+            elements.visitDefaultStepDuration.value,
+            5000
+        );
+    });
+
+    elements.visitLoop.addEventListener('change', () => {
+        currentVisit().loop = elements.visitLoop.checked;
+    });
+
     elements.downloadButton.addEventListener('click', downloadJson);
     elements.downloadMediaButton.addEventListener('click', downloadMediaJson);
     if (elements.saveVisitButton) {
@@ -1831,6 +1870,9 @@ function init() {
     elements.visitId = document.getElementById('visit_id_input');
     elements.visitName = document.getElementById('visit_name_input');
     elements.visitDescription = document.getElementById('visit_description_input');
+    elements.visitAutomatic = document.getElementById('visit_automatic_input');
+    elements.visitDefaultStepDuration = document.getElementById('visit_default_step_duration_input');
+    elements.visitLoop = document.getElementById('visit_loop_input');
     elements.stepsContainer = document.getElementById('steps_container');
     elements.downloadButton = document.getElementById('download_json_button');
     elements.downloadMediaButton = document.getElementById('download_media_json_button');

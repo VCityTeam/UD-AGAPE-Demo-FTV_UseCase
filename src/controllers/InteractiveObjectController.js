@@ -259,6 +259,7 @@ export class InteractiveObjectController {
      */
     onWheel(event) {
         if (!this.enabled || !this.selectedObject) return;
+        if (this.selectedObject.userData?.fullscreen) return;
         if (this.activeTool !== 'scale' && !this.pressedKeys.has('s')) return;
 
         this._takeOverEvent(event);

@@ -17,6 +17,29 @@ export class AnimationController {
         this.activeAnimations = new Map(); // Track animations by object ID
     }
 
+    // Find the scene object associated with a media ID.
+    _findSceneObject(objectId) {
+        const matches = this.view.scene.children.filter(
+            child => child.userData.mediaId === objectId
+        );
+
+        if (matches.length === 0) {
+            throw new Error(`Object with ID ${objectId} not found in the scene.`);
+        }
+        if (matches.length > 1) {
+            throw new Error(`Object ID ${objectId} is ambiguous.`);
+        }
+
+        return matches[0];
+    }
+
+    // Use world coordinates so nested objects are targeted correctly.
+    _getObjectPosition(object) {
+        const position = new THREE.Vector3();
+        object.getWorldPosition(position);
+        return position;
+    }
+
     /**
      * Bouge la caméra vers la position donnée
      * @param  {object} position - Position à laquelle déplacer la caméra
@@ -41,7 +64,10 @@ export class AnimationController {
      */
     cameraLookAt(position) {
         if (position) {
-            this.view.camera.camera3D.lookAt(position.x, position.y, position.z);
+            const camera = this.view.camera.camera3D;
+            camera.lookAt(position.x, position.y, position.z);
+            camera.updateMatrixWorld(true);
+            this.view.notifyChange(camera);
         }
     }
 
@@ -90,6 +116,55 @@ export class AnimationController {
             } else {
                 this.view.notifyChange(camera);
             }
+        };
+
+        this.stopCameraAnimation();
+        this.cameraAnimationId = requestAnimationFrame(animate);
+    }
+
+    /**
+     * Fait regarder la caméra vers un objet de la scène (instantané)
+     * @param {string} objectId - Identifiant du média à regarder
+     * @return {void}
+     */
+    cameraLookAtObject(objectId) {
+        const object = this._findSceneObject(objectId);
+        this.cameraLookAt(this._getObjectPosition(object));
+    }
+
+    /**
+     * Fait regarder la caméra vers un objet de manière fluide
+     * @param {string} objectId - Identifiant du média à regarder
+     * @param {number} duration - Durée de l'animation en millisecondes
+     * @return {void}
+     */
+    cameraLookAtObjectSmooth(objectId, duration = 1200) {
+        const object = this._findSceneObject(objectId);
+        const camera = this.view.camera.camera3D;
+        const startLookAt = new THREE.Vector3(0, 0, -1)
+            .applyQuaternion(camera.quaternion)
+            .normalize()
+            .multiplyScalar(camera.position.distanceTo(this._getObjectPosition(object)) || 1)
+            .add(camera.position);
+
+        let start;
+
+        const animate = (time) => {
+            if (!start) start = time;
+
+            const progress = Math.min((time - start) / duration, 1);
+            const easeProgress = progress * progress * (3 - 2 * progress);
+            const objectPosition = this._getObjectPosition(object);
+            const currentTarget = progress < 1
+                ? new THREE.Vector3().lerpVectors(startLookAt, objectPosition, easeProgress)
+                : objectPosition;
+
+            camera.lookAt(currentTarget);
+            camera.updateMatrixWorld(true);
+            this.view.notifyChange(camera);
+
+            // Keep looking at the object's current position while it moves.
+            this.cameraAnimationId = requestAnimationFrame(animate);
         };
 
         this.stopCameraAnimation();
@@ -177,10 +252,7 @@ export class AnimationController {
             targetObject = this.view.camera.camera3D
         }
         else {
-            targetObject = this.view.scene.children.find(child => child.userData.mediaId === targetObjectId);
-        }
-        if (!targetObject) {
-            throw `Object ${targetObjectId} not found`;
+            targetObject = this._findSceneObject(targetObjectId);
         }
 
         // Création des courbes selon le type

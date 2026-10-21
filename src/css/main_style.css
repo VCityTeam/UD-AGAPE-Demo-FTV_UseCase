@@ -234,6 +234,34 @@ audio {
   overflow-y: auto;
 }
 
+.demo_hub_mode_controls {
+  padding: 14px 16px 8px;
+  border-bottom: 1px solid #ddd;
+  background: #fff;
+}
+
+.demo_hub_mode_button {
+  width: 100%;
+  border: 0;
+  border-radius: 6px;
+  padding: 10px 12px;
+  background: #aaaaaa;
+  color: #000000;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.demo_hub_mode_button:hover {
+  background: #aaaaaa;
+}
+
+.demo_hub_mode_hint {
+  margin: 8px 0 0;
+  color: #666;
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+
 /* Force the invisible CSS2DRenderer container to let clicks pass through to the canvas */
 .demo_hub_screen>div:not(.itowns-bubble)[style*="z-index: 1"] {
   pointer-events: none !important;
@@ -258,32 +286,33 @@ audio {
   font-weight: bold;
 }
 
-.fullscreen-media-div {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1000;
-  pointer-events: auto;
-}
-
-.fullscreen-media-div > img,
-.fullscreen-media-div > video {
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
-  object-fit: cover;
-  display: block;
-}
-
 .demo_hub_menu_container {
   padding: 1.5rem;
   font-family: Outfit, Arial, sans-serif;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+.demo_hub_capture_controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 1.5rem 1.5rem;
+}
+
+.demo_hub_capture_controls button {
+  cursor: pointer;
+}
+
+.demo_hub_capture_controls button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.demo_hub_capture_status {
+  min-height: 1.2em;
+  font-size: 0.85rem;
 }
 
 .demo_hub_label {
@@ -293,8 +322,18 @@ audio {
   cursor: pointer;
 }
 
+.demo_hub_label.okay {
+  color: #000000;
+  font-weight: bold;
+}
+
 .demo_hub_label.wip {
   cursor: not-allowed;
+  color: #555;
+}
+
+.demo_hub_label.debug {
+  color: #000000;
 }
 
 .demo_hub_text {

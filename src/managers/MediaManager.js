@@ -15,6 +15,8 @@ export class MediaManager {
         this.view = view;
         this.guidedVisit = guidedVisit;
         this.loadedMedias = []; // Track all loaded media for cleanup
+        this._updateFullscreenMediaSize = this._updateFullscreenMediaSize.bind(this);
+        window.addEventListener('resize', this._updateFullscreenMediaSize);
     }
 
     /**
@@ -309,12 +311,9 @@ export class MediaManager {
      * @param  {string} mediaId - ID du média
      * @param  {string} mediaType - Type du média (video ou image)
      * @param  {object} media - Configuration du média
-     * @return {HTMLDivElement} - L'élément DIV créé
+     * @return {THREE.Mesh} - Le plan attaché à la caméra
      */
     addMediaAsFullscreen(mediaPath, mediaId = null, mediaType, media) {
-        const mediaDiv = document.createElement('div');
-        mediaDiv.classList.add('fullscreen-media-div');
-
         const isVideo = mediaType === 'video';
         const mediaElement = document.createElement(isVideo ? 'video' : 'img');
         mediaElement.src = mediaPath;
@@ -324,22 +323,139 @@ export class MediaManager {
             mediaElement.loop = true;
             mediaElement.muted = true;
             mediaElement.playsInline = true;
-            mediaElement.play();
         }
 
-        // Prevent event propagation
-        const stopProp = (e) => e.stopPropagation();
-        ['click', 'dblclick', 'mousedown', 'mouseup', 'mousemove', 'wheel', 'touchstart', 'touchmove', 'touchend', 'pointerdown', 'pointerup', 'pointermove'].forEach(evt => {
-            mediaElement.addEventListener(evt, stopProp);
-        });
+        let texture;
+        if (isVideo) {
+            texture = new THREE.VideoTexture(mediaElement);
+        } else {
+            const imageTexture = new THREE.TextureLoader().load(mediaPath, (loadedTexture) => {
+                this._updateFullscreenTexture(loadedTexture, loadedTexture.image);
+                this.view.notifyChange();
+            });
+            texture = imageTexture;
+        }
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.wrapS = THREE.ClampToEdgeWrapping;
+        texture.wrapT = THREE.ClampToEdgeWrapping;
 
-        console.log('Adding fullscreen media:', mediaPath, 'with ID:', mediaId, 'and element:', mediaElement);
+        const mesh = new THREE.Mesh(
+            new THREE.PlaneGeometry(1, 1),
+            new THREE.MeshBasicMaterial({
+                map: texture,
+                depthTest: false,
+                depthWrite: false,
+                side: THREE.DoubleSide
+            })
+        );
 
-        mediaDiv.appendChild(mediaElement);
-        this.view.domElement.appendChild(mediaDiv);
+        const camera = this.view.camera.camera3D;
+        // The scene uses coordinates in the millions. A near-plane-sized
+        // offset would be lost to floating-point precision after converting
+        // the camera-relative position to world coordinates.
+        const distance = Math.max(camera.near * 1.1, 100);
+        mesh.position.set(0, 0, -distance);
+        mesh.renderOrder = 10000;
+        mesh.frustumCulled = false;
+        mesh.userData.fullscreen = true;
+        mesh.userData.distance = distance;
+        mesh.userData.mediaElement = mediaElement;
+        mesh.userData.stop = () => {
+            if (isVideo) {
+                mediaElement.pause();
+                mediaElement.removeAttribute('src');
+                mediaElement.load();
+            }
+            texture.dispose();
+        };
+
+        if (isVideo) {
+            mediaElement.addEventListener('loadedmetadata', () => {
+                this._updateFullscreenTexture(texture, mediaElement);
+                this.view.notifyChange();
+            });
+            mediaElement.play().catch((error) => {
+                console.warn('Impossible de démarrer la vidéo plein écran:', error);
+            });
+        }
+
+        mesh.onBeforeRender = (_renderer, _scene, renderCamera) => {
+            const cameraPosition = new THREE.Vector3();
+            const cameraQuaternion = new THREE.Quaternion();
+
+            renderCamera.getWorldPosition(cameraPosition);
+            renderCamera.getWorldQuaternion(cameraQuaternion);
+            mesh.position.copy(cameraPosition).add(
+                new THREE.Vector3(0, 0, -distance)
+                    .applyQuaternion(cameraQuaternion)
+            );
+            mesh.quaternion.copy(cameraQuaternion);
+            mesh.updateMatrixWorld();
+        };
+        this.view.scene.add(mesh);
+        this._finalizeMedia(mesh, { type: mediaType, mediaId, trajectory: media?.trajectory });
+        this._updateFullscreenMediaSize();
         this.view.notifyChange();
 
-        return mediaDiv;
+        return mesh;
+    }
+
+    /**
+     * Dimensionne le plan plein écran à sa distance initiale de la caméra.
+     * Le plan est ensuite conservé dans la scène et ne suit plus la caméra.
+     * @return {void}
+     */
+    _updateFullscreenMediaSize() {
+        const camera = this.view.camera.camera3D;
+        const cameraAspect = camera.aspect || 1;
+
+        this.loadedMedias
+            .filter((media) => media.userData?.fullscreen)
+            .forEach((media) => {
+                const distance = media.userData.distance;
+                const planeHeight = 2 * distance
+                    * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+                const planeWidth = planeHeight * cameraAspect;
+
+                media.geometry.dispose();
+                media.geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
+
+                const source = media.userData.mediaElement;
+                if (source?.videoWidth && source.videoHeight) {
+                    this._updateFullscreenTexture(media.material.map, source);
+                } else if (source?.naturalWidth && source.naturalHeight) {
+                    this._updateFullscreenTexture(media.material.map, source);
+                }
+            });
+    }
+
+    /**
+     * Reproduit object-fit: cover sur une texture WebGL.
+     * @param {THREE.Texture} texture - Texture du média
+     * @param {HTMLImageElement|HTMLVideoElement} source - Source du média
+     * @return {void}
+     */
+    _updateFullscreenTexture(texture, source) {
+        const sourceWidth = source.videoWidth || source.naturalWidth || source.width;
+        const sourceHeight = source.videoHeight || source.naturalHeight || source.height;
+        const cameraAspect = this.view.camera.camera3D.aspect || 1;
+
+        if (!sourceWidth || !sourceHeight) return;
+
+        const sourceAspect = sourceWidth / sourceHeight;
+        texture.repeat.set(1, 1);
+        texture.offset.set(0, 0);
+
+        if (sourceAspect > cameraAspect) {
+            const repeatX = cameraAspect / sourceAspect;
+            texture.repeat.x = repeatX;
+            texture.offset.x = (1 - repeatX) / 2;
+        } else {
+            const repeatY = sourceAspect / cameraAspect;
+            texture.repeat.y = repeatY;
+            texture.offset.y = (1 - repeatY) / 2;
+        }
+        texture.needsUpdate = true;
     }
 
     /**
@@ -401,41 +517,10 @@ export class MediaManager {
      * @return {void}
      */
     removeMedia() {
-        const toRemove = [];
-
-        this.view.scene.traverse((obj) => {
-            if (obj.userData?.isMedia) {
-                toRemove.push(obj);
-            }
-        });
-
-        toRemove.forEach((obj) => {
-            // Stop any processes associated with the object
-            if (obj.userData?.stop) {
-                obj.userData.stop();
-            }
-
-            if (obj.material) {
-                if (obj.material.map) {
-                    obj.material.map.dispose();
-                }
-                obj.material.dispose();
-            }
-
-            if (obj.geometry) {
-                obj.geometry.dispose();
-            }
-
-            this.view.scene.remove(obj);
-        });
+        this.loadedMedias.slice().forEach((object) => this.removeMediaObject(object));
 
         this.view.notifyChange();
         this.guidedVisit.fsImageDisplayed = false;
-
-        // Cleanup fullscreen DOM elements
-        const fullscreenDivs = this.view.domElement.querySelectorAll('.fullscreen-media-div');
-        fullscreenDivs.forEach(div => div.remove());
-
         this.loadedMedias = [];
     }
 }

@@ -2,6 +2,7 @@ const udviz = window.app;
 
 const urlParams = new URLSearchParams(window.location.search);
 const selectedDemo = urlParams.get("demo");
+const isEditorMode = urlParams.get("mode") === "editor";
 
 /** Valeur de ?demo= qui demande de lire le brouillon de l'éditeur. */
 const LOCAL_CONFIG_DEMO = "__local__";
@@ -15,14 +16,38 @@ const MEDIA_CONFIG_LOCALSTORAGE_KEY = "agape_demo_media_config";
 
 const DEFAULT_VISIT_CONFIG = "../assets/config/freeRoamConfig.json";
 
+/** A CHANGER ABSOLUMENT, PLACEHOLDER */
+const EDITOR_FUNCTION_PLACEHOLDERS = [
+    {
+        id: "select-object",
+        name: "Sélectionner un objet",
+        category: "Objets",
+        status: "okay"
+    },
+    {
+        id: "move-object",
+        name: "Déplacer un objet",
+        category: "Objets",
+        status: "okay"
+    },
+    {
+        id: "add-action",
+        name: "Ajouter une action",
+        category: "Actions",
+        status: "okay"
+    }
+];
+
 /** Id de la visite enregistrée demandée, ou null si ce n'est pas le cas. */
 const localVisitId = selectedDemo?.startsWith(LOCAL_CONFIG_PREFIX)
     ? selectedDemo.slice(LOCAL_CONFIG_PREFIX.length)
     : null;
 
-const useLocalConfig = selectedDemo === LOCAL_CONFIG_DEMO || Boolean(localVisitId);
+const useLocalConfig = isEditorMode
+    || selectedDemo === LOCAL_CONFIG_DEMO
+    || Boolean(localVisitId);
 
-const visitConfigFile = (selectedDemo && !useLocalConfig)
+const visitConfigFile = (selectedDemo && !isEditorMode && !useLocalConfig)
     ? `../assets/config/${selectedDemo}`
     // En mode local le fichier par défaut sert de repli si le localStorage est vide.
     : DEFAULT_VISIT_CONFIG;
@@ -54,7 +79,8 @@ async function init() {
 
     createMenu(
         parsedConfigs.functionsConfig,
-        parsedConfigs.visitConfig
+        parsedConfigs.visitConfig,
+        isEditorMode
     );
 
     const { view, extent } = createView(parsedConfigs.layerConfig);
@@ -68,8 +94,12 @@ async function init() {
         parsedConfigs.mediaConfig
     );
 
-    createImageControls(guidedTour);
-    createEditorLink(guidedTour, parsedConfigs, localConfigState);
+    createAutomaticPlaybackControl(guidedTour);
+
+    if (isEditorMode) {
+        createImageControls(guidedTour);
+        createEditorLink(guidedTour, parsedConfigs, localConfigState);
+    }
 
     const firstStep = parsedConfigs.visitConfig.visits[0].steps[0];
 
@@ -289,9 +319,15 @@ function createView(layerConfig) {
         viewContainer,
         extent,
         {
-            maxSubdivisionLevel: layerConfig.background_image_layer.maxSubdivisionLevel || 15
+            maxSubdivisionLevel: layerConfig.background_image_layer.maxSubdivisionLevel || 15,
+            controls: {
+                // Allow the camera to rotate through the horizontal direction.
+                maxZenithAngle: 179
+            }
         }
     );
+    //Apres car sinon itowns override a 30m
+    view.controls.minDistanceCollision = -1;
 
     udviz.initScene(
         view.camera.camera3D,
@@ -299,10 +335,214 @@ function createView(layerConfig) {
         view.scene
     );
 
-    view.camera.camera3D.fov = 70; // un peu plus grand angle (défaut ~50)
+    //addStudioSkybox(view); //ajout skybox
+
+    setupSceneCapture(view);
+
+    view.camera.camera3D.fov = 50; // (défaut ~50)
     view.camera.camera3D.updateProjectionMatrix();
 
     return { view, extent };
+}
+
+/**
+ * Adds the six-sided studio environment behind the 3D scene.
+ * The files must be placed in assets/media/studio/.
+ * @param {object} view - Vue iTowns
+ * @return {void}
+ */
+// function addStudioSkybox(view) {
+//     const THREE = udviz.THREE;
+//     const studioPath = "../assets/media/studio/";
+//     const cubeTextureLoader = new THREE.CubeTextureLoader();
+
+//     const studioTexture = cubeTextureLoader.load(
+//         [
+//             `${studioPath}px.jpg`, // droite
+//             `${studioPath}nx.jpg`, // gauche
+//             `${studioPath}py.jpg`, // haut
+//             `${studioPath}ny.jpg`, // bas
+//             `${studioPath}pz.jpg`, // devant
+//             `${studioPath}nz.jpg`  // derriere
+//         ],
+//         (texture) => {
+//             const images = texture.image;
+//             const width = images[0]?.width;
+//             const height = images[0]?.height;
+//             const hasInvalidFace = images.some(
+//                 (image) => image.width !== width || image.height !== height
+//             );
+
+//             if (width !== height || hasInvalidFace) {
+//                 console.error(
+//                     "Skybox invalide: les six images doivent avoir les mêmes dimensions carrées."
+//                 );
+//                 view.scene.background = null;
+//                 return;
+//             }
+
+//             view.notifyChange(true);
+//         },
+//         undefined,
+//         (error) => {
+//             console.error("Impossible de charger la skybox du studio:", error);
+//             view.scene.background = null;
+//         }
+//     );
+
+//     // Avoid mipmaps so square non-power-of-two images remain usable.
+//     studioTexture.generateMipmaps = false;
+//     studioTexture.minFilter = THREE.LinearFilter;
+//     studioTexture.colorSpace = THREE.SRGBColorSpace;
+//     view.scene.background = studioTexture;
+// }
+
+/**
+ * Installe un captureur sur le rendu principal de la vue.
+ * Les rendus vers des render targets (picking, profondeur, etc.) sont ignorés.
+ *
+ * @param {object} view - Vue iTowns
+ */
+function setupSceneCapture(view) {
+    const renderer = view.mainLoop.gfxEngine.renderer;
+    const captureCanvas = renderer.domElement;
+    const CaptureConstructor = window.CCapture;
+
+    if (!CaptureConstructor) {
+        console.error(
+            "CCapture n'est pas chargé. Vérifier le script CCapture dans hub_demos.html."
+        );
+        return;
+    }
+
+    let capturer = null;
+    let captureRequested = false;
+    let captureInProgress = false;
+    let frameCapturePromise = null;
+
+    const originalRender = renderer.render.bind(renderer);
+    renderer.render = (...args) => {
+        originalRender(...args);
+
+        if (
+            capturer?.capturing
+            && captureRequested
+            && !captureInProgress
+            && args[0] === view.scene
+            && args[1] === view.camera.camera3D
+        ) {
+            captureInProgress = true;
+            frameCapturePromise = capturer.capture(captureCanvas)
+                .then(() => {
+                    captureInProgress = false;
+                    // FrameWrap does not replace requestAnimationFrame, so
+                    // controls and other scene actions remain responsive.
+                    if (capturer?.capturing && captureRequested) {
+                        view.notifyChange(true);
+                    }
+                })
+                .catch((error) => {
+                    captureInProgress = false;
+                    console.error("Capture de la scène impossible:", error);
+                    captureStatus.textContent = `Erreur de capture: ${error.message}`;
+                })
+                .finally(() => {
+                    frameCapturePromise = null;
+                });
+        }
+    };
+
+    let capturePromise = null;
+    const captureStatus = document.createElement("span");
+    captureStatus.className = "demo_hub_capture_status";
+
+    const formatSelect = document.createElement("select");
+    formatSelect.setAttribute("aria-label", "Format de capture");
+    CaptureConstructor.formats.forEach((format) => {
+        const option = document.createElement("option");
+        option.value = format;
+        option.textContent = format.toUpperCase();
+        option.selected = format === "webm";
+        formatSelect.appendChild(option);
+    });
+
+    const startButton = document.createElement("button");
+    startButton.type = "button";
+    startButton.textContent = "Démarrer la capture";
+    startButton.addEventListener("click", async () => {
+        if (capturer?.capturing || capturePromise) return;
+
+        const FrameWrap = CaptureConstructor.FrameWrap;
+        if (!FrameWrap) {
+            captureStatus.textContent = "FrameWrap est indisponible dans CCapture.";
+            return;
+        }
+
+        const format = formatSelect.value;
+        // Use FrameWrap instead of CCapture: CCapture.start() replaces
+        // requestAnimationFrame globally with a virtual clock, which prevents
+        // iTowns controls and user interactions from running normally.
+        capturer = new FrameWrap({
+            format,
+            ...(format === "webm" ? { codec: "vp9" } : {}),
+            framerate: 60,
+            name: "agape-scene"
+        });
+        capturePromise = capturer.start();
+        try {
+            await capturePromise;
+            captureRequested = true;
+            captureStatus.textContent = "Capture en cours…";
+            startButton.disabled = true;
+            stopButton.disabled = false;
+            view.notifyChange(true);
+        } catch (error) {
+            captureRequested = false;
+            capturer = null;
+            console.error("Démarrage de la capture impossible:", error);
+            captureStatus.textContent = `Erreur de capture: ${error.message}`;
+        } finally {
+            capturePromise = null;
+        }
+    });
+
+    const stopButton = document.createElement("button");
+    stopButton.type = "button";
+    stopButton.textContent = "Arrêter et télécharger";
+    stopButton.disabled = true;
+    stopButton.addEventListener("click", async () => {
+        if (!capturer?.capturing) return;
+
+        stopButton.disabled = true;
+        captureRequested = false;
+        captureStatus.textContent = "Préparation du téléchargement…";
+        try {
+            if (frameCapturePromise) await frameCapturePromise;
+            await capturer.stop();
+            await capturer.save();
+            captureStatus.textContent = "Capture téléchargée.";
+            startButton.disabled = false;
+        } catch (error) {
+            console.error("Téléchargement de la capture impossible:", error);
+            captureStatus.textContent = `Erreur de téléchargement: ${error.message}`;
+            startButton.disabled = false;
+        }
+    });
+
+    const controls = document.createElement("div");
+    controls.className = "demo_hub_capture_controls";
+    controls.append(formatSelect, startButton, stopButton, captureStatus);
+
+    document.querySelector(".demo_hub_menu")?.appendChild(controls);
+
+    // API pratique pour la console et pour les futurs contrôles externes.
+    window.sceneCapture = {
+        start: () => startButton.click(),
+        stop: () => stopButton.click(),
+        get capturer() {
+            return capturer;
+        }
+    };
 }
 
 function addLayers(view, extent, layerConfig) {
@@ -352,10 +592,8 @@ function addLayers(view, extent, layerConfig) {
             layerConfig.elevation_layer.layer_name,
             {
                 useColorTextureElevation: true,
-                colorTextureElevationMinZ:
-                    layerConfig.elevation_layer.colorTextureElevationMinZ,
-                colorTextureElevationMaxZ:
-                    layerConfig.elevation_layer.colorTextureElevationMaxZ,
+                colorTextureElevationMinZ: layerConfig.elevation_layer.colorTextureElevationMinZ,
+                colorTextureElevationMaxZ: layerConfig.elevation_layer.colorTextureElevationMaxZ,
 
                 source: new udviz.itowns.WMSSource({
                     extent: extent,
@@ -377,7 +615,11 @@ function createGuidedTour(view, visitConfig, mediaConfig) {
         mediaConfig.medias
     );
 
-    guidedTour.goToStep(0);
+    guidedTour.goToStep(0).then(() => {
+        if (guidedTour.automaticPlayback) {
+            guidedTour.startAutomaticPlayback();
+        }
+    });
 
     guidedTour.previousButton.innerText = "Previous";
     guidedTour.nextButton.innerText = "Next";
@@ -387,37 +629,42 @@ function createGuidedTour(view, visitConfig, mediaConfig) {
     return guidedTour;
 }
 
-function createMenu(functionsConfig, visitConfig) {
+function createMenu(functionsConfig, visitConfig, editorMode = false) {
     const menuDiv = document.querySelector(".demo_hub_menu");
 
     if (!menuDiv || !functionsConfig?.functions) return;
 
     const categories = {};
+    const editorCategories = {};
 
-    functionsConfig.functions.forEach(func => {
+    const addToCategories = (func, target) => {
         const cat = func.category || "Other";
         const subcat = func.subcategory || null;
 
-        if (!categories[cat]) {
-            categories[cat] = {
+        if (!target[cat]) {
+            target[cat] = {
                 items: [],
                 subcategories: {}
             };
         }
 
         if (subcat) {
-            if (!categories[cat].subcategories[subcat]) {
-                categories[cat].subcategories[subcat] = [];
+            if (!target[cat].subcategories[subcat]) {
+                target[cat].subcategories[subcat] = [];
             }
 
-            categories[cat].subcategories[subcat].push(func);
+            target[cat].subcategories[subcat].push(func);
         } else {
-            categories[cat].items.push(func);
+            target[cat].items.push(func);
         }
-    });
+    };
+
+    functionsConfig.functions.forEach((func) => addToCategories(func, categories));
+    EDITOR_FUNCTION_PLACEHOLDERS.forEach((func) => addToCategories(func, editorCategories));
 
     const menuContainer = document.createElement("div");
     menuContainer.className = "demo_hub_menu_container";
+    const firstEditorFunction = EDITOR_FUNCTION_PLACEHOLDERS[0];
 
     const onDemoChange = (e) => {
         if (e.target.value) {
@@ -425,76 +672,91 @@ function createMenu(functionsConfig, visitConfig) {
         }
     };
 
-    const createRadioOption = (func) => {
-    const configValue = func.config || func.id;
+    const onEditorFunctionChange = (e) => {
+        const selected = e.target.closest("label")?.querySelector(".demo_hub_text");
+        const description = menuDiv.querySelector(".demo_hub_description");
+        if (selected && description) {
+            description.textContent = `${selected.textContent} : fonctionnalité prête à être configurée.`;
+        }
+    };
 
-    const label = document.createElement("label");
-    label.className =
-        "demo_hub_label" +
-        (func.status === "wip" ? " wip" : "");
+    const createRadioOption = (func, editorFunction = false) => {
+        const configValue = func.config || func.id;
 
-    const radio = document.createElement("input");
-    radio.type = "radio";
-    radio.name = "demoSelect";
-    radio.value = configValue;
+        const label = document.createElement("label");
+        label.className =
+            "demo_hub_label" +
+            (func.status === "debug"
+                ? " debug"
+                : func.status === "wip"
+                    ? " wip"
+                    : " okay");
 
-    if (func.status === "wip") {
-        radio.disabled = true;
-        
-    }
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = editorFunction ? "editorFunction" : "demoSelect";
+        radio.value = configValue;
 
-    if (
-        selectedDemo === configValue ||
-        (!selectedDemo &&
-            configValue.includes("visitConfig_dynamic"))
-    ) {
-        radio.checked = true;
-    }
+        if (func.status === "wip") {
+            radio.disabled = true;
+        }
 
-    radio.addEventListener("change", onDemoChange);
+        if (
+            editorFunction
+                ? configValue === (firstEditorFunction?.config || firstEditorFunction?.id)
+                : selectedDemo === configValue
+                || (!selectedDemo && func.id === "freeRoam")
+        ) {
+            radio.checked = true;
+        }
 
-    const text = document.createElement("span");
-    text.className = "demo_hub_text";
+        radio.addEventListener(
+            "change",
+            editorFunction ? onEditorFunctionChange : onDemoChange
+        );
 
-    if (func.status === "debug") {
-        text.innerText = func.name + " (DEBUG)";
-        text.classList.add("debug");
+        const text = document.createElement("span");
+        text.className = "demo_hub_text";
 
-    } else if (func.status === "wip") {
-        text.innerText = func.name + " (WIP)";
-        text.classList.add("wip");
-        //text.hidden = true;
-        //radio.hidden = true;
+        if (func.status === "debug") {
+            text.innerText = func.name + " (DEBUG)";
+            text.classList.add("debug");
 
+        } else if (func.status === "wip") {
+            text.innerText = func.name + " (WIP)";
+            text.classList.add("wip");
 
-    } else {
-        text.innerText = func.name;
-    }
+        } else {
+            text.innerText = func.name;
+        }
 
-    label.appendChild(radio);
-    label.appendChild(text);
+        label.appendChild(radio);
+        label.appendChild(text);
 
-    return label;
-};
+        return label;
+    };
 
     // Les visites locales apparaissent comme des démos parmi les autres, pour ne
     // pas dépendre d'une URL à taper à la main.
     const localOptions = [];
 
     const draft = readLocalConfig(VISIT_CONFIG_LOCALSTORAGE_KEY);
-    if (draft?.visits?.length) {
+    if (editorMode || draft?.visits?.length) {
         localOptions.push({
             config: LOCAL_CONFIG_DEMO,
-            name: `${draft.visits[0].name || "Visite"} (brouillon)`
+            name: `${draft?.visits?.[0]?.name || "Visite locale"}`
+                + (draft?.visits?.length ? " (brouillon)" : "")
         });
     }
 
-    (window.visitLibrary?.list() ?? []).forEach((entry) => {
-        localOptions.push({
-            config: LOCAL_CONFIG_PREFIX + entry.id,
-            name: entry.name
+    if (!editorMode) {
+        (window.visitLibrary?.list() ?? []).forEach((entry) => {
+            localOptions.push({
+                config: LOCAL_CONFIG_PREFIX + entry.id,
+                name: entry.name
+            });
         });
-    });
+    }
 
     if (localOptions.length > 0) {
         const localDiv = document.createElement("div");
@@ -505,11 +767,14 @@ function createMenu(functionsConfig, visitConfig) {
         localTitle.innerText = "Visites locales";
         localDiv.appendChild(localTitle);
 
-        localOptions.forEach((option) => localDiv.appendChild(createRadioOption(option)));
+        localOptions.forEach((option) => localDiv.appendChild(
+            createRadioOption(option, false)
+        ));
         menuContainer.appendChild(localDiv);
     }
 
-    for (const [category, data] of Object.entries(categories)) {
+    const visibleCategories = editorMode ? editorCategories : categories;
+    for (const [category, data] of Object.entries(visibleCategories)) {
         const catDiv = document.createElement("div");
         catDiv.className = "demo_hub_category";
 
@@ -520,7 +785,7 @@ function createMenu(functionsConfig, visitConfig) {
         catDiv.appendChild(title);
 
         data.items.forEach(func => {
-            catDiv.appendChild(createRadioOption(func));
+            catDiv.appendChild(createRadioOption(func, editorMode));
         });
 
         for (const [subcat, funcs] of Object.entries(data.subcategories)) {
@@ -534,7 +799,7 @@ function createMenu(functionsConfig, visitConfig) {
             subDiv.appendChild(subTitle);
 
             funcs.forEach(func => {
-                subDiv.appendChild(createRadioOption(func));
+                subDiv.appendChild(createRadioOption(func, editorMode));
             });
 
             catDiv.appendChild(subDiv);
@@ -546,13 +811,59 @@ function createMenu(functionsConfig, visitConfig) {
     const description = document.createElement("div");
     description.className = "demo_hub_description";
 
-    description.innerText =
-        visitConfig?.description ??
-        visitConfig?.visits?.[0]?.description ??
-        "No description available.";
+    description.innerText = editorMode
+        ? "Sélectionnez une fonctionnalité à appliquer aux objets de la visite locale."
+        : visitConfig?.description
+            ?? visitConfig?.visits?.[0]?.description
+            ?? "No description available.";
 
+    createModeToggle(menuDiv, editorMode);
     menuDiv.appendChild(menuContainer);
     menuDiv.appendChild(description);
+}
+
+/**
+ * Switches between the demo list and the local-visit editing surface.
+ * Reloading is intentional: the editor mode must be backed by the local visit
+ * before image objects are added to the scene.
+ * @param {Element} menuDiv - Hub menu
+ * @param {boolean} editorMode - Whether editor mode is active
+ * @return {void}
+ */
+function createModeToggle(menuDiv, editorMode) {
+    const controls = document.createElement("div");
+    controls.className = "demo_hub_mode_controls";
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "demo_hub_mode_button";
+    button.textContent = editorMode ? "Mode édition" : "Mode visualisation";
+    button.setAttribute(
+        "aria-label",
+        editorMode
+            ? "Revenir au mode visualisation"
+            : "Ouvrir le mode édition"
+    );
+
+    button.addEventListener("click", () => {
+        const params = new URLSearchParams();
+        if (editorMode) {
+            if (selectedDemo) params.set("demo", selectedDemo);
+        } else {
+            params.set("mode", "editor");
+            params.set("demo", LOCAL_CONFIG_DEMO);
+        }
+        window.location.search = params.toString();
+    });
+
+    const hint = document.createElement("p");
+    hint.className = "demo_hub_mode_hint";
+    hint.textContent = editorMode
+        ? "Visite locale active : ajoutez des images ou choisissez une fonctionnalité."
+        : "Choisissez une démo pour l’afficher dans la scène.";
+
+    controls.append(button, hint);
+    menuDiv.appendChild(controls);
 }
 
 /**
@@ -670,7 +981,9 @@ function sendVisitToEditor(guidedTour, parsedConfigs) {
 
     // Les octets étant dans le dépôt partagé, il suffit de repasser `value` sur le
     // chemin portable: l'éditeur retrouvera le média par sa `storageKey`.
-    const medias = guidedTour.mediaConfig ?? [];
+    const medias = Array.isArray(guidedTour.mediaConfig)
+        ? guidedTour.mediaConfig
+        : guidedTour.mediaConfig?.medias ?? [];
     const portable = medias.map((media) => {
         if (window.mediaStore) return window.mediaStore.toPortable(media);
 
@@ -746,6 +1059,46 @@ function createImageControls(guidedTour) {
     menuDiv.appendChild(controls);
 }
 
+function createAutomaticPlaybackControl(guidedTour) {
+    const menuDiv = document.querySelector(".demo_hub_menu");
+    if (!menuDiv) return;
+
+    const controls = document.createElement("div");
+    controls.className = "demo_hub_media_controls";
+
+    const toggleButton = document.createElement("button");
+    toggleButton.type = "button";
+    toggleButton.className = "demo_hub_add_image";
+
+    const status = document.createElement("p");
+    status.className = "demo_hub_media_status";
+
+    const updateLabel = () => {
+        const active = guidedTour.automaticPlayback;
+        toggleButton.textContent = active
+            ? "Mettre la lecture automatique en pause"
+            : "Reprendre la lecture automatique";
+        status.textContent = active
+            ? "Lecture automatique activée."
+            : "Lecture automatique en pause.";
+    };
+
+    toggleButton.addEventListener("click", () => {
+        guidedTour.automaticPlayback = !guidedTour.automaticPlayback;
+        if (guidedTour.automaticPlayback) {
+            guidedTour.startAutomaticPlayback();
+        } else {
+            guidedTour.stopAutomaticPlayback();
+        }
+        updateLabel();
+    });
+
+    controls.appendChild(toggleButton);
+    controls.appendChild(status);
+    menuDiv.appendChild(controls);
+    updateLabel();
+}
+
 function addImageToCurrentStep(guidedTour, file) {
     const step = guidedTour.getCurrentStep();
     if (!step) return null;
@@ -786,9 +1139,7 @@ function addImageToCurrentStep(guidedTour, file) {
         scale: media.scale
     });
 
-    if (Array.isArray(guidedTour.mediaConfig)) {
-        guidedTour.mediaConfig.push(media);
-    }
+    registerRuntimeMedia(guidedTour, media);
 
     const imageMesh = guidedTour.mediaManager.addImageAtCoordinates(
         media.value,
@@ -807,6 +1158,29 @@ function addImageToCurrentStep(guidedTour, file) {
     guidedTour.updateInteractiveToggleButton();
 
     return imageMesh;
+}
+
+/**
+ * Add a media created in the scene to the collection used by later steps.
+ * @param {object} guidedTour - Current guided visit
+ * @param {object} media - Media configuration to register
+ * @return {void}
+ */
+function registerRuntimeMedia(guidedTour, media) {
+    if (Array.isArray(guidedTour.mediaConfig)) {
+        guidedTour.mediaConfig.push(media);
+        return;
+    }
+
+    if (!guidedTour.mediaConfig) {
+        guidedTour.mediaConfig = { medias: [] };
+    }
+
+    if (!Array.isArray(guidedTour.mediaConfig.medias)) {
+        guidedTour.mediaConfig.medias = [];
+    }
+
+    guidedTour.mediaConfig.medias.push(media);
 }
 
 /**
